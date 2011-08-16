@@ -6,7 +6,7 @@ return array(
         'commands' => array(
             'api' => array(
                 'descr' => 'generates API docs for the classes in the enables libraries',
-                'callback' => 'CyDocs::cli_api_bootstrap',
+                'callback' => array(CyDocs::inst(), 'cli_api_bootstrap'),
                 'arguments' => array(
                     '--root-dir' => array(
                         'alias' => '-r',
@@ -37,6 +37,12 @@ return array(
                         'default' => FALSE,
                         'descr' => 'flag marking that PDF output should be generated instead of HTML',
                         'parameter' => NULL
+                    ),
+                    '--forced' => array(
+                        'parameter' => NULL,
+                        'default' => FALSE,
+                        'alias' => '-f',
+                        'descr' => 'the generator removes all existing docs directories if passed'
                     )
                 )
             )
