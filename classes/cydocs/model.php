@@ -22,7 +22,7 @@ abstract class CyDocs_Model {
 
     protected static $_parameters = array();
 
-    private final function  __construct(Reflector $reflector) {
+    protected function  __construct(Reflector $reflector) {
         $this->reflector = $reflector;
     }
 

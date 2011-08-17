@@ -10,6 +10,12 @@ class CyDocs_Model_Property extends CyDocs_Model {
 
     public $type;
 
+    public function  __construct($reflector = NULL) {
+        if ( ! is_null($reflector)) {
+            parent::__construct($reflector);
+        }
+    }
+
     public function init() {
         $this->name = $this->reflector->getName();
         $this->comment = $this->reflector->getDocComment();

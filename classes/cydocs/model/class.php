@@ -6,6 +6,8 @@ class CyDocs_Model_Class extends CyDocs_Model {
 
     public $parent_class;
 
+    public $subclasses = array();
+
     public $implemented_interfaces = array();
 
     public $constants = array();
@@ -34,24 +36,56 @@ class CyDocs_Model_Class extends CyDocs_Model {
         $this->comment = $reflector->getDocComment();
         $this->reflector = $reflector;
         foreach ($reflector->getInterfaces() as $intf) {
-            $this->implemented_interfaces []= CyDocs_Model::for_reflector($intf);
+            if ( ! $intf->isInternal()) {
+                $this->implemented_interfaces []= CyDocs_Model::for_reflector($intf);
+            }
         }
-        foreach ($reflector->getConstants() as $name) {
-            $this->constants[$name] = $reflector->getConstant($name);
+        foreach ($reflector->getConstants() as $name => $value) {
+            $this->constants[$name] = $value;
         }
         foreach ($reflector->getStaticProperties() as $ref_prop) {
             //$this->static_properties []= CyDocs_Model::for_reflector($ref_prop);
         }
         foreach ($reflector->getProperties() as $ref_prop) {
-            $this->properties []= CyDocs_Model::for_reflector($ref_prop);
+            if ($ref_prop->getDeclaringClass() == $reflector) {
+                $this->properties []= CyDocs_Model::for_reflector($ref_prop);
+            }
         }
         foreach ($reflector->getMethods() as $ref_method) {
-            $this->methods []= CyDocs_Model::for_reflector($ref_method);
+            if ($ref_method->getDeclaringClass() == $reflector) {
+                $this->methods []= CyDocs_Model::for_reflector($ref_method);
+            }
         }
     }
 
     public function  post_loading() {
-
+        $parser = new CyDocs_Parser($this->comment, $this->name);
+        $comment = $this->comment = $parser->parse();
+        //var_dump($comment->annotations);
+        $prop_annots = $comment->annotations_by_name(array('property', 'property-read'));
+        foreach ($prop_annots as $prop_annot) {
+            $prop = new CyDocs_Model_Property;
+            $prop->name = $prop_annot->formal_name;
+            $prop->type = $prop_annot->type;
+            $this->properties []= $prop;
+        }
+        $pkg_annots = $comment->annotations_by_name('package');
+        switch (count($pkg_annots)) {
+            case 0:
+                log_warning($this, 'couldn\'t determine library for class ' . $this->name);
+                break;
+            case 1:
+                $this->library = strtolower($pkg_annots[0]->text);
+                CyDocs_Model_Library::add_class($this);
+                break;
+            default:
+                log_warning($this, 'multiple @package annotations for class ' . $this->name);
+        }
+        foreach (self::$_classes as $class) {
+            if ($class->parent_class === $this) {
+                $this->subclasses []= $class;
+            }
+        }
     }
 
 }

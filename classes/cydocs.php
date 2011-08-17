@@ -33,6 +33,12 @@ class CyDocs {
         foreach ($classnames as $classname) {
            $class_models []= CyDocs_Model::for_reflector(new ReflectionClass($classname));
         }
+
+        $lib_models = array();
+        foreach ($libs as $lib_str) {
+            $lib_models []= new CyDocs_Model_Library($lib_str);
+        }
+        
         CyDocs_Model::fire_post_load();
 
         $root_dir = $args['--root-dir'];
@@ -43,15 +49,12 @@ class CyDocs {
                 echo $ex->getMessage();
             }
         }
-        $lib_models = array();
-        foreach ($libs as $lib_str) {
-            $lib_models []= new CyDocs_Model_Library($lib_str);
-        }
+        
         mkdir($root_dir);
         if (count($libs) > 1) {
             $output = new CyDocs_Output_HTML($root_dir, $lib_models);
         } else {
-            $output = new CyDocs_Output_HTML_Library($root_dir, $lib_models[0]);
+            $output = new CyDocs_Output_HTML_Library($root_dir, $lib_models[0], $args['--stylesheet']);
         }
         $output->generate();
     }

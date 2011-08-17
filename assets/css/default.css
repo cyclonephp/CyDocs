@@ -1,0 +1,25 @@
+body {
+    font-family: sans-serif;
+}
+
+.classes {
+    list-style-type: none;
+}
+
+.classes a {
+    text-decoration: none;
+}
+
+.classes a:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
+.classes a:visited {
+    text-decoration: none;
+    color: blue;
+}
+
+h1, h3 {
+    display: inline-block;
+}
