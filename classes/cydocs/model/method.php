@@ -47,7 +47,45 @@ class CyDocs_Model_Method extends CyDocs_Model {
     }
 
     public function post_loading() {
-        
+        parent::post_loading();
+        $parser = new CyDocs_Parser($this->comment, $this); 
+        $comment = $parser->parse();
+        $return_annots = $comment->annotations_by_name(array('return', 'returns'));
+        if (count($return_annots) > 1) {
+            log_warning($this, 'ambigious return type for ' . $this->string_identifier());
+        } elseif (count($return_annots) == 1) {
+            $this->return_type = $return_annots[0]->type;
+        } else {
+            $this->return_type = 'void';
+        }
+
+        $param_annots = $comment->annotations_by_name('param');
+        foreach ($param_annots as $param_annot) {
+            if ( ! $param_annot->formal_name) {
+                log_warning($this, 'invalid @param annotation at ' . $this->string_identifier());
+                continue;
+            }
+            $found_param_model = NULL;
+            foreach ($this->parameters as $param) {
+                if ('$' . $param->name == $param_annot->formal_name) {
+                    $found_param_model = $param;
+                    break;
+                }
+            }
+            if (NULL === $found_param_model) {
+                log_warning($this, $this->string_identifier() . ' does not have parameter \''
+                        . $param_annot->formal_name . '\'');
+                continue;
+            }
+            $found_param_model->type = $param_annot->type;
+        }
+        foreach ($this->parameters as $model) {
+            $model->post_loading();
+        }
+    }
+
+    public function  string_identifier() {
+        return $this->class->name . '::' . $this->name . '()';
     }
 
 }

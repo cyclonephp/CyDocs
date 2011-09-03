@@ -2,6 +2,8 @@
 
 class CyDocs_Model_Property extends CyDocs_Model {
 
+    private static $_log;
+
     public $is_static;
 
     public $class;
@@ -13,6 +15,9 @@ class CyDocs_Model_Property extends CyDocs_Model {
     public function  __construct($reflector = NULL) {
         if ( ! is_null($reflector)) {
             parent::__construct($reflector);
+        }
+        if (NULL === self::$_log) {
+            self::$_log = Log::for_class($this);
         }
     }
 
@@ -33,7 +38,23 @@ class CyDocs_Model_Property extends CyDocs_Model {
     }
 
     public function  post_loading() {
+        parent::post_loading();
+        $parser = new CyDocs_Parser($this->comment, $this);
+        $comment = $parser->parse();
+        $var_annots = $comment->annotations_by_name('var');
+        if (count($var_annots) > 1) {
+            self::$_log->add_error('ambiguous property type at ' . $this->class->name . '::' . $this->name);
+        }
+        if (count($var_annots) >= 1) {
+            $var_annot = $var_annots[0];
+            $this->type = $var_annot->type;
+        } else {
+            self::$_log->add_error('unknown property type at ' . $this->class->name . '::' . $this->name);
+        }
+    }
 
+    public function  string_identifier() {
+        return $this->class->name . '::$' . $this->name;
     }
 
     

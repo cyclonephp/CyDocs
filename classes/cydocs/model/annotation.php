@@ -26,6 +26,7 @@ abstract class CyDocs_Model_Annotation {
             , 'license' => 'plain'
             , 'var' => 'type'
             , 'type' => 'type'
+            , 'access' => 'plain'
         );
 
         $class = 'CyDocs_Model_Annotation_' . $class_suffixes[$annotation_name];

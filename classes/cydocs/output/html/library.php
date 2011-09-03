@@ -76,11 +76,11 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
         return $view;
     }
 
-    public function class_docs_file($classname) {
+    public static function class_docs_file($classname) {
         return 'classes/' . strtolower(str_replace('_', '/', $classname)) . '.html';
     }
 
-    public function path_to_root($classname) {
+    public static function path_to_root($classname) {
         $rval = '../';
         $len = strlen($classname);
         for ($i = 0; $i < $len; ++$i) {

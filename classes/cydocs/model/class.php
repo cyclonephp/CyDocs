@@ -26,7 +26,7 @@ class CyDocs_Model_Class extends CyDocs_Model {
 
     public function init() {
         $reflector = $this->reflector;
-        $this->name = $reflector->getName();
+        CyDocs::inst()->current_class = $this->name = $reflector->getName();
         if (($parent_class = $reflector->getParentClass()) != FALSE && ! $parent_class->isInternal()) {
             $this->parent_class = CyDocs_Model::for_reflector($parent_class);
         }
@@ -35,6 +35,8 @@ class CyDocs_Model_Class extends CyDocs_Model {
         $this->is_interface = $reflector->isInterface();
         $this->comment = $reflector->getDocComment();
         $this->reflector = $reflector;
+
+        $exclude_private = ! CyDocs::inst()->internal;
         foreach ($reflector->getInterfaces() as $intf) {
             if ( ! $intf->isInternal()) {
                 $this->implemented_interfaces []= CyDocs_Model::for_reflector($intf);
@@ -47,19 +49,23 @@ class CyDocs_Model_Class extends CyDocs_Model {
             //$this->static_properties []= CyDocs_Model::for_reflector($ref_prop);
         }
         foreach ($reflector->getProperties() as $ref_prop) {
-            if ($ref_prop->getDeclaringClass() == $reflector) {
+            if ($ref_prop->getDeclaringClass() == $reflector
+                    && ! ($exclude_private && $ref_prop->isPrivate())) {
                 $this->properties []= CyDocs_Model::for_reflector($ref_prop);
             }
         }
         foreach ($reflector->getMethods() as $ref_method) {
-            if ($ref_method->getDeclaringClass() == $reflector) {
+            if ($ref_method->getDeclaringClass() == $reflector
+                    && ! ($exclude_private && $ref_method->isPrivate())) {
                 $this->methods []= CyDocs_Model::for_reflector($ref_method);
             }
         }
+        CyDocs::inst()->current_class = NULL;
     }
 
     public function  post_loading() {
-        $parser = new CyDocs_Parser($this->comment, $this->name);
+        CyDocs::inst()->current_class = $this->name;
+        $parser = new CyDocs_Parser($this->comment, $this);
         $comment = $this->comment = $parser->parse();
         //var_dump($comment->annotations);
         $prop_annots = $comment->annotations_by_name(array('property', 'property-read'));
@@ -86,6 +92,18 @@ class CyDocs_Model_Class extends CyDocs_Model {
                 $this->subclasses []= $class;
             }
         }
+
+        foreach ($this->properties as $model) {
+            $model->post_loading();
+        }
+        foreach ($this->methods as $model) {
+            $model->post_loading();
+        }
+        CyDocs::inst()->current_class = NULL;
+    }
+
+    public function  string_identifier() {
+        return $this->name;
     }
 
 }

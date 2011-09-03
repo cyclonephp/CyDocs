@@ -14,4 +14,8 @@ class CyDocs_Output_HTML_Class implements CyDocs_Output {
         $this->_stylesheet = $stylesheet;
     }
 
+    public function generate() {
+        
+    }
+
 }

@@ -1,3 +1,7 @@
+a:visited {
+    color: blue;
+}
+
 body {
     font-family: sans-serif;
 }
@@ -22,4 +26,17 @@ body {
 
 h1, h3 {
     display: inline-block;
+}
+
+.properties .prop-name {
+    font-weight: bold;
+}
+
+.properties .type, .methods .type {
+    font-style: italic;
+    color: #222;
+}
+
+a.coderef {
+    text-decoration: none;
 }

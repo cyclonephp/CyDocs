@@ -1,8 +1,16 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ * @property-read internal
+ */
 class CyDocs {
     
     private static $_inst;
+
+    private static $_enabled_attributes = array('internal');
 
     /**
      * @return CyDocs
@@ -13,6 +21,30 @@ class CyDocs {
         }
         return self::$_inst;
     }
+
+    /**
+     *
+     * @var boolean
+     */
+    private $_internal;
+
+    /**
+     * The name of the class that is currently under processing.
+     *
+     * @var string
+     * @usedby CyDocs_Model::coderef_to_anchor()
+     * @usedby CyDocs_Model_Class
+     */
+    public $current_class;
+
+    public function __get($key) {
+        if (in_array($key, self::$_enabled_attributes)) {
+            return $this->{'_' . $key};
+        }
+        throw new CyDocs_Exception("attribute '$key' does not exist or is not readable");
+    }
+
+
 
     private function  __construct() {
         //empty private constructor
@@ -28,10 +60,15 @@ class CyDocs {
         if ($libs[0] == 'all') {
             $libs = FileSystem::enabled_libs();
         }
+        $this->_internal = $args['--internal'];
         $classnames = $this->load_classes($libs);
         $class_models = array();
         foreach ($classnames as $classname) {
-           $class_models []= CyDocs_Model::for_reflector(new ReflectionClass($classname));
+            try {
+                $class_models []= CyDocs_Model::for_reflector(new ReflectionClass($classname));
+            } catch (ReflectionException $ex) {
+                log_warning($this, $ex->getMessage(), $ex->getCode());
+            }
         }
 
         $lib_models = array();
@@ -75,6 +112,9 @@ class CyDocs {
                 continue;
             }
             $classname = substr($val, strpos($val, 'classes') + strlen('classes/'));
+            if (substr($classname, strlen($classname) - strlen('.php')) != '.php') {
+                continue;
+            }
             $classname = substr($classname, 0, strlen($classname) - strlen('.php'));
             $classname = str_replace(DIRECTORY_SEPARATOR, '_', $classname);
             $rval []= $classname;

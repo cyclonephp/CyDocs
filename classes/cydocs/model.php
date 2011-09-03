@@ -12,7 +12,19 @@ abstract class CyDocs_Model {
 
     public $reflector;
 
+    /**
+     * The raw text of the comment.
+     *
+     * @var string
+     */
     public $comment;
+
+    /**
+     * The already HTML-formatted free-form text
+     *
+     * @var string
+     */
+    public $free_form_text;
 
     protected static $_classes = array();
 
@@ -42,7 +54,7 @@ abstract class CyDocs_Model {
             return self::$_classes[$key];
         }
         if ($reflector instanceof ReflectionMethod) {
-            $key = $reflector->getDeclaringClass()->getName() . '::' . $reflector->getName();
+            $key = $reflector->getDeclaringClass()->getName() . '::' . $reflector->getName() . '()';
             if (isset(self::$_methods[$key]))
                 return self::$_methods[$key];
             self::$_methods[$key] = new CyDocs_Model_Method($reflector);
@@ -51,7 +63,6 @@ abstract class CyDocs_Model {
         }
         if ($reflector instanceof ReflectionProperty) {
             $key = $reflector->getDeclaringClass()->getName() . '::' . $reflector->getName();
-            //echo count(self::$_properties) . '---------------------' .$key. PHP_EOL;
             if (isset(self::$_properties[$key]))
                 return self::$_properties[$key];
             self::$_properties[$key] = new CyDocs_Model_Property($reflector);
@@ -76,24 +87,61 @@ abstract class CyDocs_Model {
         foreach (self::$_classes as $model) {
             $model->post_loading();
         }
-        foreach (self::$_properties as $model) {
-            $model->post_loading();
-        }
-        foreach (self::$_methods as $model) {
-            $model->post_loading();
-        }
-        foreach (self::$_parameters as $method_params) {
-            foreach ($method_params as $model) {
-                $model->post_loading();
-            }
-        }
     }
 
-    abstract function init();
+    public static function coderef_to_anchor($coderef_str) {
+        $coderef = explode('::', $coderef_str);
+        if (count($coderef) == 1) {
+            $classname = CyDocs::inst()->current_class;
+            $toolname = $coderef[0];
+            // the tool name can be a class name
+            if (isset(self::$_classes[$toolname])) {
+                return '<a class="coderef" href="' . CyDocs_Output_HTML_Library::path_to_root($toolname) . '../'
+                . CyDocs_Output_HTML_Library::class_docs_file($toolname) . '">'
+                . $coderef_str . '</a>';
+            }
+        } elseif (count($coderef) == 2) {
+            $classname = $coderef[0];
+            $toolname = $coderef[1];
+        } else {
+            log_error($this, "invalid code reference: $coderef");
+            return $coderef_str;
+        }
+
+        $candidate_key = $classname . '::' . $toolname;
+
+        if (isset(self::$_methods[$candidate_key])) {
+            return '<a class="coderef" href="' . CyDocs_Output_HTML_Library::path_to_root($classname) . '../'
+                . CyDocs_Output_HTML_Library::class_docs_file($classname)
+                . '#method-' . $toolname
+                . '">' . $coderef_str . '</a>';
+        } elseif (isset(self::$_properties[$candidate_key])) {
+            return '<a class="coderef" href="' . CyDocs_Output_HTML_Library::path_to_root($classname) . '../'
+                . CyDocs_Output_HTML_Library::class_docs_file($classname)
+                . '#prop-' . $toolname
+                . '">'
+                . $coderef_str . '</a>';
+        }
+        
+
+        return $coderef_str;
+    }
+
+    public abstract function init();
+
+    public abstract function string_identifier();
 
     /**
      * Called by CyDocs_Model for each instance after a CyDocs_Model_Class instance
      * is created for all PHP classes to be documented.
      */
-    abstract function post_loading();
+    public function post_loading() {
+        if (NULL === $this->comment)
+            return;
+
+        $parser = new CyDocs_Parser($this->comment, $this);
+        $comment = $parser->parse();
+        $this->free_form_text = implode("\n", $comment->text);
+    }
+
 }

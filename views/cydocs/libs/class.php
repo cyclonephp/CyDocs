@@ -48,13 +48,43 @@
 
 <? if ( ! empty($class->properties)) : ?>
 <h2>Properties</h2>
-<ul class="properties">
+<div class="properties">
 <? foreach ($class->properties as $prop) : ?>
+    <a name="prop-<?= $prop->name ?>"></a>
+    <p class="prop-details">
     <span class="modifiers"><?= $prop->visibility ?></span>
-    <h3><?= $prop->name ?></h3>
-    <?= $prop->comment ?>
+    <span class="type"><?= $prop->type ?></span>
+    <span class="prop-name"><?= $prop->name ?></span>
+    <?= $prop->free_form_text ?>
+    </p>
 <? endforeach; ?>
-</ul>
+</div>
+<? endif; ?>
+
+<? if ( ! empty($class->methods)) : ?>
+<h2>Methods</h2>
+<div class="methods">
+<? foreach ($class->methods as $method) : ?>
+    <a name="method-<?= $method->name ?>"></a>
+    <p class="method-details">
+        <span class="modifiers"><?= $method->visibility ?></span>
+        <span class="type"><?= $method->return_type ?></span>
+        <span class="method-name"><?= $method->name ?></span>
+         (<?
+         $first = TRUE;
+         foreach ($method->parameters as $param) {
+             if ( ! $first) echo ', ';
+             $first = FALSE;
+             echo $param->type . ' <code>$' . $param->name;
+             if ($param->show_default) {
+                 echo ' = ' . $param->default;
+             }
+             echo '</code>';
+         }?>)
+        <?= $method->free_form_text ?>
+    </p>
+<? endforeach; ?>
+    </div>
 <? endif; ?>
  
     </body>
