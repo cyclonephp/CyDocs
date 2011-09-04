@@ -47,7 +47,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
         $this->_stylesheet = $stylesheet;
     }
 
-    public function generate() {
+    public function generate_api() {
         mkdir($this->_root_dir . 'libs/');
         $index_view = View::factory('cydocs/index');
         file_put_contents($this->_root_dir . 'index.html', $index_view->render());
@@ -60,7 +60,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
             mkdir($libroot);
             $lib_output = new CyDocs_Output_HTML_Library(
                 $libroot, $model, $this->_stylesheet);
-            $lib_output->generate();
+            $lib_output->generate_api();
             $this->_lib_outputs []= $lib_output;
         }
     }
@@ -73,6 +73,36 @@ class CyDocs_Output_HTML implements CyDocs_Output {
         $liblist_view = View::factory('cydocs/libs'
                 , array('libs' => $libs_data));
         file_put_contents($this->_root_dir . 'libs.html', $liblist_view->render());
+    }
+
+    public function  generate_manual() {
+        $lib_manuals = array();
+        foreach ($this->_lib_models as $model) {
+            $lib_root_path = FileSystem::get_root_path($model->name);
+            $manual_file = $lib_root_path . 'manual/manual.txt';
+            if (file_exists($manual_file)) {
+                $lib_manuals[$model->name] = CyDocs_Text_Formatter::manual_formatter(file_get_contents($manual_file))
+                        ->create_manual();
+                $lib_manuals[$model->name]->title = $model->name;
+            } else {
+                log_warning($this, "no manual found for library '{$model->name}'");
+            }
+        }
+        file_put_contents($this->_root_dir . 'manual.html'
+                , $this->merge_lib_manuals($lib_manuals)->render());
+    }
+
+    public function merge_lib_manuals(array $lib_manuals) {
+        $rval = new CyDocs_Model_Manual;
+        foreach ($lib_manuals as $lib_manual) {
+            $lib_section = new CyDocs_Model_Manual_Section;
+            $lib_section->id = $lib_manual->title;
+            $lib_section->title = $lib_manual->title;
+            $lib_section->sections = $lib_manual->sections;
+            $lib_section->text = $lib_manual->text;
+            $rval->sections []= $lib_section;
+        }
+        return $rval;
     }
 
 }

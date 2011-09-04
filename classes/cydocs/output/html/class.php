@@ -28,8 +28,12 @@ class CyDocs_Output_HTML_Class implements CyDocs_Output {
         $this->_stylesheet = $stylesheet;
     }
 
-    public function generate() {
+    public function generate_api() {
         
+    }
+
+    public function generate_manual() {
+        throw new CyDocs_Exception('manual generation for classes is not supported');
     }
 
 }

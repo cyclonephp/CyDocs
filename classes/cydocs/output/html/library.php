@@ -35,7 +35,7 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
         $this->_stylesheet = $stylesheet;
     }
 
-    public function generate() {
+    public function generate_api() {
         mkdir($this->_root_dir . 'classes/');
         $this->create_classes_html();
         $index_view = View::factory('cydocs/libs/index');
@@ -48,7 +48,7 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
             $dirpath = substr($filepath, 0, strrpos($filepath, '/'));
             $class_output = new CyDocs_Output_HTML_Class($this->_root_dir . 'classes/'
                     , $class, $this->_stylesheet);
-            $class_output->generate();
+            $class_output->generate_api();
             if ( ! is_dir($dirpath)) {
                 mkdir($dirpath, 0755, TRUE);
             }
@@ -114,6 +114,19 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
 
     public function create_property_list($props) {
         
+    }
+
+    public function generate_manual() {
+        $lib_root_path = FileSystem::get_root_path($this->_model->name);
+        $manual_root_path = $lib_root_path . 'manual/';
+        if (file_exists($manual_root_path . 'manual.txt')) {
+            $formatter = CyDocs_Text_Formatter::manual_formatter(file_get_contents($manual_root_path . 'manual.txt'));
+            $manual = $formatter->create_manual();
+            $manual->title = $this->_model->name;
+            file_put_contents($this->_root_dir . 'manual.html', $manual->render());
+        } else {
+            log_warning($this, "no manual found for library '{$this->_model->name}'");
+        }
     }
 
 

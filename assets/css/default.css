@@ -60,3 +60,15 @@ ul.properties a {
     text-decoration: none;
     font-size: 80%
 }
+
+ul.toc {
+    list-style-type: none;
+}
+
+ul.toc a {
+    text-decoration: none;
+}
+
+ul.toc a:hover {
+    text-decoration: underline;
+}

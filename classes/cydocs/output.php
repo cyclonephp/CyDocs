@@ -7,6 +7,8 @@
  */
 interface CyDocs_Output {
 
-    public function generate();
+    public function generate_api();
+
+    public function generate_manual();
     
 }

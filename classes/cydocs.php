@@ -104,7 +104,8 @@ class CyDocs {
         } else {
             $output = new CyDocs_Output_HTML_Library($root_dir, $lib_models[0], $args['--stylesheet']);
         }
-        $output->generate();
+        $output->generate_api();
+        $output->generate_manual();
     }
 
     public function load_classes($libs) {

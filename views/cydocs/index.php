@@ -7,6 +7,6 @@
                 <frame src="libs.html"/>
                 <frame name="frm-classes"/>
             </frameset>
-            <frame name="frm-content"/>
+            <frame name="frm-content" src="manual.html"/>
         </frameset>
 </html>

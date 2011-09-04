@@ -57,6 +57,24 @@ class CyDocs_Text_Formatter {
 
     private $_idx;
 
+    /**
+     *
+     * @var CyDocs_Model_Manual
+     */
+    private $_manual;
+
+    /**
+     *
+     * @var CyDocs_Model_Manual_Section
+     */
+    private $_current_section;
+
+    /**
+     *
+     * @var CyDocs_Model_Manual_Section
+     */
+    private $_current_subsection;
+
     private function  __construct($text, $enabled_tags) {
         if (is_array($text)) {
             $text = implode("\n", $text);
@@ -74,29 +92,35 @@ class CyDocs_Text_Formatter {
         $rval = '';
         $len = $this->_length;
         for($this->_idx = 0; $this->_idx < $len; ++$this->_idx) {
-            $char = $this->_text[$this->_idx]; echo $char;
+            $char = $this->_text[$this->_idx];// echo $char;
             if ($char === '@' || $char === '\\') {
                 ++$this->_idx;
                 $token = $this->next_token();
                 if (isset($this->_tag_callbacks[$token])) {
-                    $processed_tag = call_user_func(array($this
+                    $just_parsed = call_user_func(array($this
                             , 'tag_' . $this->_tag_callbacks[$token])
                             , $token);
-                    $rval .= $processed_tag;
                 } else {
                     log_warning($this, "unknown formatting tag '$token'");
                 }
             } else {
-                $rval .= $char;
+                $just_parsed = $char;
+            }
+            if ( ! is_null($this->_current_subsection)) {
+                $this->_current_subsection->text .= $just_parsed;
+            } elseif ( ! is_null($this->_current_section)) {
+                $this->_current_section->text .= $just_parsed;
+            } else {
+                $rval .= $just_parsed;
             }
         }
         return $rval;
     }
 
     private function tag_coderef($tag) {
-        $this->skip_whitespaces();
+        $this->read_whitespaces();
         $coderef = $this->next_token();
-        return CyDocs_Model::coderef_to_anchor($coderef) . ' ';
+        return CyDocs_Model::coderef_to_anchor($coderef) . ' '; // :)
     }
 
     private function tag_code($tag) {
@@ -107,7 +131,7 @@ class CyDocs_Text_Formatter {
                 log_error("unclosed @code tag, omitting formatted source from output.");
                 return '';
             }
-            $code .= $this->skip_whitespaces();
+            $code .= $this->read_whitespaces();
             $token = $this->next_token();
             if ($token == '@endcode' || $token == '\endcode')
                 break;
@@ -125,15 +149,58 @@ class CyDocs_Text_Formatter {
     }
 
     private function tag_internal($tag) {
-
+        if ( ! CyDocs::inst()->internal) {
+            $this->_idx = $this->_length; // skipping the remaining (internal) part
+        }
+        return '';
     }
 
     private function tag_section($tag) {
+        if (NULL === $this->_manual)
+            throw new CyDocs_Exception("@section tags are not enabled in comment texts");
 
+        $section = new CyDocs_Model_Manual_Section;
+        $this->_manual->sections []= $section;
+        $this->_current_section = $section;
+
+        $this->parse_section_line($section);
+    }
+
+    private function parse_section_line(CyDocs_Model_Manual_Section $section) {
+        $section_line = '';
+        for(; $this->_idx < $this->_length; ++$this->_idx) {
+            $char = $this->_text[$this->_idx];
+            if ($char === "\n" || $char === "\r") // end of line
+                break;
+
+            $section_line .= $char;
+        }
+
+        $words = explode(' ', trim($section_line));
+        $word_count = count($words);
+        if ($word_count == 0) {
+            log_warning($this, "failed to parse @section tag");
+        } elseif ($word_count == 1) {
+            $section->title = $section->id = $words[0];
+            log_warning($this, "no section title found, using the section ID ('{$section->id}') as title");
+        } else {
+            $section->id = array_shift($words);
+            $section->title = implode(' ', $words);
+        }
     }
 
     private function tag_subsection($tag) {
-        
+        if (NULL === $this->_manual)
+            throw new CyDocs_Exception("@subsection tags are not enabled in comment texts");
+
+        if (NULL === $this->_current_section)
+             throw new CyDocs_Exception("@subsection tags should not appear before at least one @section tag");
+
+        $subsection = new CyDocs_Model_Manual_Section;
+        $this->_current_section->sections []= $subsection;
+        $this->_current_subsection = $subsection;
+
+        $this->parse_section_line($subsection);
     }
 
     private function tag_img($tag) {
@@ -156,7 +223,7 @@ class CyDocs_Text_Formatter {
         return $rval;
     }
 
-    private function skip_whitespaces() {
+    private function read_whitespaces() {
         $rval = '';
         for (; $this->_idx < $this->_length; ++$this->_idx) {
             $char = $this->_text[$this->_idx];
@@ -175,6 +242,10 @@ class CyDocs_Text_Formatter {
         return $this->format();
     }
 
-    
+    public function create_manual() {
+        $this->_manual = new CyDocs_Model_Manual;
+        $this->_manual->text = $this->format();
+        return $this->_manual;
+    }
 
 }

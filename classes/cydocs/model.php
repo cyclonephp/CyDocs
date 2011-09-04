@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
