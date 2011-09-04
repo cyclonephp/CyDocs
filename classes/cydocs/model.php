@@ -14,6 +14,8 @@ abstract class CyDocs_Model {
 
     const VISIBILITY_PRIVATE = 'private';
 
+    const VISIBILITY_READONLY = 'readonly';
+
     /**
      * The name of the represented tool (a class name,  property name,
      * method name or method parameter name).
@@ -184,7 +186,9 @@ abstract class CyDocs_Model {
 
         $parser = new CyDocs_Parser($this->comment, $this);
         $comment = $parser->parse();
-        $this->free_form_text = implode("\n", $comment->text);
+
+        $this->free_form_text = CyDocs_Text_Formatter::comment_formatter($comment->text)
+                ->format();
     }
 
 }

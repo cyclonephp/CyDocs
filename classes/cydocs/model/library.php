@@ -20,7 +20,7 @@ class CyDocs_Model_Library {
 
         $libname = trim($class->library);
         if ( ! isset(self::$_instances[$libname]))
-            throw new CyDocs_Exception("library '$libname' does not exist");
+            log_warning(__CLASS__, "library '$libname' does not exist, but class {$class->name} belongs to it");
 
         self::$_instances[$libname]->classes []= $class;
     }
@@ -49,6 +49,20 @@ class CyDocs_Model_Library {
     public function  __construct($lib_name) {
         $this->name = strtolower($lib_name);
         self::$_instances[strtolower($lib_name)] = $this;
+    }
+
+    public static function fire_post_load() {
+        foreach (self::$_instances as $lib) {
+            if ($lib instanceof CyDocs_Model_Library) {
+                $lib->post_loading();
+            }
+        }
+    }
+
+    public function post_loading() {
+        uasort($this->classes, function($a, $b) {
+            return strcmp($a->name, $b->name);
+        });
     }
 
     

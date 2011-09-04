@@ -38,7 +38,7 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
     public function generate() {
         mkdir($this->_root_dir . 'classes/');
         $this->create_classes_html();
-        $index_view = View::factory('cydocs/index');
+        $index_view = View::factory('cydocs/libs/index');
         file_put_contents($this->_root_dir . 'index.html', $index_view->render());
         copy($this->_stylesheet, $this->_root_dir . 'stylesheet.css');
         foreach ($this->_model->classes as $class) {

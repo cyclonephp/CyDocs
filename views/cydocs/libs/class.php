@@ -12,7 +12,7 @@
     extends <?= $class->parent_class ?>
     <? endif; ?>
 <div class="free-form-text">
-    <?= implode(' ', $class->comment->text) ?>
+    <?= $class->free_form_text ?>
 </div>
 <? if ( ! empty($class->subclasses)) : ?>
 <h4>Direct known subclasses: </h4>

@@ -85,8 +85,9 @@ class CyDocs {
         foreach ($libs as $lib_str) {
             $lib_models []= new CyDocs_Model_Library($lib_str);
         }
-        
+
         CyDocs_Model::fire_post_load();
+        CyDocs_Model_Library::fire_post_load();
 
         $root_dir = $args['--root-dir'];
         if ($args['--forced']) {

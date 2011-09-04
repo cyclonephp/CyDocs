@@ -123,6 +123,7 @@ class CyDocs_Model_Class extends CyDocs_Model {
     }
 
     public function  post_loading() {
+        parent::post_loading();
         CyDocs::inst()->current_class = $this->name;
         $parser = new CyDocs_Parser($this->comment, $this);
         $comment = $this->comment = $parser->parse();
@@ -133,7 +134,14 @@ class CyDocs_Model_Class extends CyDocs_Model {
             $prop->name = $prop_annot->formal_name;
             $prop->type = $prop_annot->type;
             $prop->class = $this;
+            if ($prop_annot->name == 'property-read') {
+                $prop->visibility = CyDocs_Model::VISIBILITY_READONLY;
+            } else {
+                $prop->visibility = CyDocs_Model::VISIBILITY_PUBLIC;
+            }
             $this->properties []= $prop;
+            $obj_pool_key = $this->name . '::' . $prop->name;
+            self::$_properties[$obj_pool_key] = $prop;
         }
         $pkg_annots = $comment->annotations_by_name('package');
         switch (count($pkg_annots)) {
@@ -162,6 +170,15 @@ class CyDocs_Model_Class extends CyDocs_Model {
         if ( ! is_null($this->parent_class)) {
             $this->parent_class = CyDocs_Model::coderef_to_anchor($this->parent_class->name);
         }
+        uasort($this->subclasses, function($a, $b) {
+            return strcmp($a, $b);
+        });
+        uasort($this->properties, function($a, $b) {
+            return strcmp($a->name, $b->name);
+        });
+        uasort($this->methods, function($a, $b) {
+            return strcmp($a->name, $b->name);
+        });
         CyDocs::inst()->current_class = NULL;
     }
 

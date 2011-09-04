@@ -49,14 +49,30 @@ class CyDocs_Output_HTML implements CyDocs_Output {
 
     public function generate() {
         mkdir($this->_root_dir . 'libs/');
+        $index_view = View::factory('cydocs/index');
+        file_put_contents($this->_root_dir . 'index.html', $index_view->render());
+        copy($this->_stylesheet, $this->_root_dir . 'stylesheet.css');
+
+        $this->create_libs_html();
+
         foreach ($this->_lib_models as $model) {
-            mkdir ($this->_root_dir . 'libs/' . $model->name . '/');
+            $libroot = $this->_root_dir . 'libs/' . $model->name . '/';
+            mkdir($libroot);
             $lib_output = new CyDocs_Output_HTML_Library(
-                $this->_root_dir . 'libs/' . $model->name . '/'
-                , $model, $this->_stylesheet);
+                $libroot, $model, $this->_stylesheet);
             $lib_output->generate();
             $this->_lib_outputs []= $lib_output;
         }
+    }
+
+    public function create_libs_html() {
+        $libs_data = array();
+        foreach ($this->_lib_models as $lib_model) {
+            $libs_data[$lib_model->name] = $this->_root_dir . 'libs/' . $lib_model->name . '/classes.html';
+        }
+        $liblist_view = View::factory('cydocs/libs'
+                , array('libs' => $libs_data));
+        file_put_contents($this->_root_dir . 'libs.html', $liblist_view->render());
     }
 
 }
