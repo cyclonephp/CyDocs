@@ -1,5 +1,11 @@
 <?php
 
+
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 abstract class CyDocs_Model {
 
     const VISIBILITY_PUBLIC = 'public';
@@ -8,8 +14,20 @@ abstract class CyDocs_Model {
 
     const VISIBILITY_PRIVATE = 'private';
 
+    /**
+     * The name of the represented tool (a class name,  property name,
+     * method name or method parameter name).
+     *
+     * @var string
+     */
     public $name;
 
+    /**
+     * The reflector instance that is examined. The properties of the subclasses
+     * will be populated using this property by the \c init() implementations.
+     *
+     * @var Reflector
+     */
     public $reflector;
 
     /**
@@ -26,12 +44,36 @@ abstract class CyDocs_Model {
      */
     public $free_form_text;
 
+    /**
+     * Object pool for the created class instances.
+     * It's maintained by \c for_reflector() .
+     *
+     * @var array<CyDocs_Model_Class>
+     */
     protected static $_classes = array();
 
+    /**
+     * Object pool for the created method instances.
+     * It's maintained by \c for_reflector() .
+     *
+     * @var array<CyDocs_Model_Method>
+     */
     protected static $_methods = array();
 
+    /**
+     * Object pool for the created property instances.
+     * It's maintained by \c for_reflector() .
+     *
+     * @var array<CyDocs_Model_Class>
+     */
     protected static $_properties = array();
 
+    /**
+     * Object pool for the created parameter instances.
+     * It's maintained by \c for_reflector() .
+     *
+     * @var array<CyDocs_Model_Class>
+     */
     protected static $_parameters = array();
 
     protected function  __construct(Reflector $reflector) {
@@ -90,13 +132,14 @@ abstract class CyDocs_Model {
     }
 
     public static function coderef_to_anchor($coderef_str) {
+        $root_path = CyDocs_Output_HTML_Library::path_to_root(CyDocs::inst()->current_class);
         $coderef = explode('::', $coderef_str);
         if (count($coderef) == 1) {
             $classname = CyDocs::inst()->current_class;
             $toolname = $coderef[0];
             // the tool name can be a class name
             if (isset(self::$_classes[$toolname])) {
-                return '<a class="coderef" href="' . CyDocs_Output_HTML_Library::path_to_root($toolname) . '../'
+                return '<a class="coderef" href="' . $root_path
                 . CyDocs_Output_HTML_Library::class_docs_file($toolname) . '">'
                 . $coderef_str . '</a>';
             }
@@ -111,12 +154,12 @@ abstract class CyDocs_Model {
         $candidate_key = $classname . '::' . $toolname;
 
         if (isset(self::$_methods[$candidate_key])) {
-            return '<a class="coderef" href="' . CyDocs_Output_HTML_Library::path_to_root($classname) . '../'
+            return '<a class="coderef" href="' . $root_path
                 . CyDocs_Output_HTML_Library::class_docs_file($classname)
                 . '#method-' . $toolname
                 . '">' . $coderef_str . '</a>';
         } elseif (isset(self::$_properties[$candidate_key])) {
-            return '<a class="coderef" href="' . CyDocs_Output_HTML_Library::path_to_root($classname) . '../'
+            return '<a class="coderef" href="' . $root_path
                 . CyDocs_Output_HTML_Library::class_docs_file($classname)
                 . '#prop-' . $toolname
                 . '">'

@@ -1,11 +1,32 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 class CyDocs_Output_HTML_Library implements CyDocs_Output {
 
+    /**
+     * The absolute path of the directory where the library docs should be
+     * generated to.
+     *
+     * @var string
+     */
     private $_root_dir;
 
+    /**
+     * The library instance that the documentation is generated for.
+     *
+     * @var CyDocs_Model_Library
+     */
     private $_model;
 
+    /**
+     * The stylesheet to be applied on the documentation.
+     *
+     * @var string
+     */
     private $_stylesheet;
 
     public function  __construct($root_dir, CyDocs_Model_Library $model, $stylesheet) {

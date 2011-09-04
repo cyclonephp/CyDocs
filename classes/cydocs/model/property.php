@@ -1,15 +1,45 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 class CyDocs_Model_Property extends CyDocs_Model {
 
+    /**
+     * The logger instance.
+     *
+     * @var Log_Adapter
+     */
     private static $_log;
 
+    /**
+     * Flag marking that the property is static.
+     *
+     * @var boolean
+     */
     public $is_static;
 
+    /**
+     * The class that this property belongs to.
+     *
+     * @var CyDocs_Model_Class
+     */
     public $class;
 
+    /**
+     * The visibility of the property (see \c CyDocs_Model constants).
+     *
+     * @var string
+     */
     public $visibility;
 
+    /**
+     * The type of the property.
+     *
+     * @var string
+     */
     public $type;
 
     public function  __construct($reflector = NULL) {

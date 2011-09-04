@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 abstract class CyDocs_Model_Annotation {
 
     /**
@@ -37,6 +42,11 @@ abstract class CyDocs_Model_Annotation {
         return $inst;
     }
 
+    /**
+     * The name of the annotation, not including the leading '@' character
+     *
+     * @var string
+     */
     public $name;
 
     /**
@@ -46,11 +56,21 @@ abstract class CyDocs_Model_Annotation {
      */
     public $text;
 
+    /**
+     * Sequence of words that follows the annotation name.
+     *
+     * @var array
+     */
     protected $_words;
 
+    /**
+     * A model instance that the annotation belongs to.
+     *
+     * @var CyDocs_Model
+     */
     protected $_owner;
 
-    private function  __construct($words, $owner) {
+    private function  __construct($words, CyDocs_Model $owner) {
         $this->name = array_shift($words);
         $this->_words = $words;
         $this->_owner = $owner;

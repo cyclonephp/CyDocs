@@ -1,7 +1,17 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 class CyDocs_Parser {
 
+    /**
+     * The annotations that are recognized by the parser.
+     *
+     * @var array
+     */
     public static $enabled_annotations = array('author'
         , 'package'
         , 'modified'
@@ -21,6 +31,11 @@ class CyDocs_Parser {
         , 'access'
     );
 
+    /**
+     * The raw text of the comment to be parsed.
+     *
+     * @var string
+     */
     private $_plain_text;
 
     /**

@@ -1,27 +1,86 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 class CyDocs_Model_Class extends CyDocs_Model {
 
+    /**
+     * The library that the represented class belongs to.
+     *
+     * @var CyDocs_Model_Library
+     */
     public $library;
 
+    /**
+     * The direct superclass of the represented class.
+     *
+     * @var CyDocs_Model_Class
+     */
     public $parent_class;
 
+    /**
+     * The direct known subclasses of the represented class.
+     *
+     * @var array<CyDocs_Model_Class>
+     */
     public $subclasses = array();
 
+    /**
+     * The interfaces implemented by the represented class.
+     *
+     * @var array<CyDocs_Model_Class>
+     */
     public $implemented_interfaces = array();
 
+    /**
+     * Class constanst (key-value pairs).
+     *
+     * @var array
+     */
     public $constants = array();
 
+    /**
+     *
+     * @var array
+     */
     public $static_properties;
 
+    /**
+     * The declared properties of the class.
+     *
+     * @var array<CyDocs_Model_Property>
+     */
     public $properties = array();
 
+    /**
+     * The methods of the represented class.
+     *
+     * @var array<CyDocs_Model_Method>
+     */
     public $methods = array();
 
+    /**
+     * Flag marking that the class is final or not.
+     *
+     * @var boolean
+     */
     public $is_final;
 
+    /**
+     * Flag marking that the class is abstract or not.
+     *
+     * @var boolean
+     */
     public $is_abstract;
 
+    /**
+     * Flag marking that the represented class is in fact not a class but an interface.
+     *
+     * @var boolean
+     */
     public $is_interface;
 
     public function init() {
@@ -73,6 +132,7 @@ class CyDocs_Model_Class extends CyDocs_Model {
             $prop = new CyDocs_Model_Property;
             $prop->name = $prop_annot->formal_name;
             $prop->type = $prop_annot->type;
+            $prop->class = $this;
             $this->properties []= $prop;
         }
         $pkg_annots = $comment->annotations_by_name('package');
@@ -89,7 +149,7 @@ class CyDocs_Model_Class extends CyDocs_Model {
         }
         foreach (self::$_classes as $class) {
             if ($class->parent_class === $this) {
-                $this->subclasses []= $class;
+                $this->subclasses []= CyDocs_Model::coderef_to_anchor($class->name);
             }
         }
 
@@ -98,6 +158,9 @@ class CyDocs_Model_Class extends CyDocs_Model {
         }
         foreach ($this->methods as $model) {
             $model->post_loading();
+        }
+        if ( ! is_null($this->parent_class)) {
+            $this->parent_class = CyDocs_Model::coderef_to_anchor($this->parent_class->name);
         }
         CyDocs::inst()->current_class = NULL;
     }

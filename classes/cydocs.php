@@ -4,12 +4,22 @@
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
- * @property-read internal
+ * @property-read boolean $internal
  */
 class CyDocs {
-    
+
+    /**
+     * The singleton instance.
+     *
+     * @var CyDocs
+     */
     private static $_inst;
 
+    /**
+     * The readonly properties of \c CyDocs
+     *
+     * @var array
+     */
     private static $_enabled_attributes = array('internal');
 
     /**
@@ -89,7 +99,7 @@ class CyDocs {
         
         mkdir($root_dir);
         if (count($libs) > 1) {
-            $output = new CyDocs_Output_HTML($root_dir, $lib_models);
+            $output = new CyDocs_Output_HTML($root_dir, $lib_models, $args['--stylesheet']);
         } else {
             $output = new CyDocs_Output_HTML_Library($root_dir, $lib_models[0], $args['--stylesheet']);
         }

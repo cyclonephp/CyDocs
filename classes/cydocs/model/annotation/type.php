@@ -1,9 +1,23 @@
 <?php
 
+/**
+ * 
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 class CyDocs_Model_Annotation_Type extends CyDocs_Model_Annotation {
 
+    /**
+     * The formal name of the tool (property or method parameter) that's type
+     * is defined by this annotation.
+     *
+     * @var string
+     */
     public $formal_name;
 
+    /**
+     * @var string
+     */
     public $type;
 
     protected function init() {

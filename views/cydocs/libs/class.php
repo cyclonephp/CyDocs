@@ -5,15 +5,20 @@
     </head>
     <body>
 <?= $modifiers ?>
-<h1><?= $class->name ?></h1>
+<h1>
+    <?= $class->name ?>
+</h1>
+        <? if ($class->parent_class) : ?>
+    extends <?= $class->parent_class ?>
+    <? endif; ?>
 <div class="free-form-text">
     <?= implode(' ', $class->comment->text) ?>
 </div>
 <? if ( ! empty($class->subclasses)) : ?>
 <h4>Direct known subclasses: </h4>
     <ul>
-<? foreach ($class->subclasses as $subclass) : ?>
-        <li><a href="?"><?= $subclass->name ?></a></li>
+<? foreach ($class->subclasses as $url => $subclass) : ?>
+        <li><?= $subclass ?></li>
 <? endforeach; ?>
     </ul>
 <? endif; ?>
@@ -27,7 +32,7 @@
 <? endif; ?>
 
 <? if ( ! empty($class->properties)) : ?>
-<h2>Properties</h2>
+<h2>Property summary</h2>
 <ul class="properties">
 <? foreach ($class->properties as $prop) : ?>
     <li><a href="#prop-<?= $prop->name ?>" class="<?= $prop->visibility ?>"><?= $prop->name ?></a></li>
@@ -36,7 +41,7 @@
 <? endif; ?>
 
 <? if ( ! empty($class->methods)) : ?>
-<h2>Methods</h2>
+<h2>Method summary</h2>
 <ul class="properties">
 <? foreach ($class->methods as $method) : ?>
     <li><a href="#method-<?= $method->name ?>" class="<?= $method->visibility ?>"><?= $method->name ?></a></li>
@@ -55,7 +60,9 @@
     <span class="modifiers"><?= $prop->visibility ?></span>
     <span class="type"><?= $prop->type ?></span>
     <span class="prop-name"><?= $prop->name ?></span>
+    <span class="prop-descr">
     <?= $prop->free_form_text ?>
+        </span>
     </p>
 <? endforeach; ?>
 </div>
@@ -64,26 +71,7 @@
 <? if ( ! empty($class->methods)) : ?>
 <h2>Methods</h2>
 <div class="methods">
-<? foreach ($class->methods as $method) : ?>
-    <a name="method-<?= $method->name ?>"></a>
-    <p class="method-details">
-        <span class="modifiers"><?= $method->visibility ?></span>
-        <span class="type"><?= $method->return_type ?></span>
-        <span class="method-name"><?= $method->name ?></span>
-         (<?
-         $first = TRUE;
-         foreach ($method->parameters as $param) {
-             if ( ! $first) echo ', ';
-             $first = FALSE;
-             echo $param->type . ' <code>$' . $param->name;
-             if ($param->show_default) {
-                 echo ' = ' . $param->default;
-             }
-             echo '</code>';
-         }?>)
-        <?= $method->free_form_text ?>
-    </p>
-<? endforeach; ?>
+<? foreach ($class->methods as $method) echo View::factory('cydocs/libs/method', array('method' => $method));?>
     </div>
 <? endif; ?>
  
