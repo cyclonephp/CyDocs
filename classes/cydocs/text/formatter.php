@@ -8,9 +8,12 @@ class CyDocs_Text_Formatter {
 
     /**
      * Retrurns a formatter that is able to format the lines as library manual text.
+     * After creation the manual can be created using the \c create_manual() method.
      *
      * @param array $text
      * @return CyDocs_Text_Formatter
+     * @usedby CyDocs_Output_HTML::generate_manual()
+     * @usedby CyDocs_Output_HTML_Library::generate_manual()
      */
     public static function manual_formatter($text) {
         return new CyDocs_Text_Formatter($text, array(
@@ -39,6 +42,17 @@ class CyDocs_Text_Formatter {
         ));
     }
 
+    /**
+     * Annotation name => formatter callback pairs.
+     *
+     * Not all annotations are allowed in any kind of documentation that can be
+     * formatted by this class, the enabled annotations are set up at the static
+     * factory methods.
+     *
+     * @see CyDocs_Text_Formatter::comment_formatter()
+     * @see CyDocs_Text_Formatter::manual_formatter()
+     * @var array
+     */
     private static $_available_tag_callbacks = array(
         'c' => 'coderef',
         'code' => 'code',
@@ -49,15 +63,45 @@ class CyDocs_Text_Formatter {
         'include' => 'include'
     );
 
+    /**
+     * Annotation name => formatter callback pairs. Set up in the constructor.
+     * The array items are a subset of \c CyDocs_Text_Formatter::$_available_tag_callbacks
+     *
+     * @var array
+     */
     private $_tag_callbacks = array();
 
+    /**
+     * The original, raw text to be parsed.
+     *
+     * @var string
+     */
     private $_text;
 
+    /**
+     * The length of the original text. It's stored in this property to avoid
+     * re-calculating <code>strlen($this->_text)</code> in every parser methods
+     * in the class.
+     *
+     * @var int
+     */
     private $_length;
 
+    /**
+     * The index of the last parsed character in $_text .
+     * The main character iteration is done at \c CyDocs_Text_Formatter::format()
+     * but the other parser methods - called by the \c format() method will also
+     * modify this value. All parser methods should maintain the proper value
+     * manually, first of all they should avoid running it over \c CyDocs_Text_Formatter::$_length .
+     *
+     * @var int
+     */
     private $_idx;
 
     /**
+     * The manual instace to be generated. The instance value is created by \c create_manual()
+     * and the parser methods that need this value will throw an exception  if
+     * its value is <code>NULL</code>.
      *
      * @var CyDocs_Model_Manual
      */
@@ -242,6 +286,14 @@ class CyDocs_Text_Formatter {
         return $this->format();
     }
 
+    /**
+     * Creates the object representing the manual created from the parsed text.
+     * You are supposed to call this method only on those instances which were
+     * created using \c CyDocs_Text_Formatter::manual_formatter() .
+     *
+     *
+     * @return CyDocs_Model_Manual
+     */
     public function create_manual() {
         $this->_manual = new CyDocs_Model_Manual;
         $this->_manual->text = $this->format();

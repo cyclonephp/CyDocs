@@ -61,6 +61,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
             $lib_output = new CyDocs_Output_HTML_Library(
                 $libroot, $model, $this->_stylesheet);
             $lib_output->generate_api();
+            $lib_output->generate_manual();
             $this->_lib_outputs []= $lib_output;
         }
     }

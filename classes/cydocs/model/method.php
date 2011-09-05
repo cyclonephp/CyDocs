@@ -172,4 +172,18 @@ class CyDocs_Model_Method extends CyDocs_Model {
         return $this->class->name . '::' . $this->name . '()';
     }
 
+    public function modifiers() {
+        $rval = $this->visibility;
+        if ($this->is_static) {
+            $rval .= ' static';
+        }
+        if ($this->is_abstract) {
+            $rval .= ' abstract';
+        }
+        if ($this->is_final) {
+            $rval .= ' final';
+        }
+        return $rval;
+    }
+
 }

@@ -1,6 +1,6 @@
 <a name="method-<?= $method->name ?>"></a>
     <div class="method-details">
-        <span class="modifiers"><?= $method->visibility ?></span>
+        <span class="modifiers"><?= $method->modifiers() ?> </span>
         <span class="type"><?= $method->return_type ?></span>
         <span class="method-name"><?= $method->name ?></span>
          (<?

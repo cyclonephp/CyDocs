@@ -80,3 +80,11 @@ ul.toc a {
 ul.toc a:hover {
     text-decoration: underline;
 }
+
+.lnk-manual {
+    font-size: 80%;
+}
+
+.lnk-manual a {
+    text-decoration: none;
+}

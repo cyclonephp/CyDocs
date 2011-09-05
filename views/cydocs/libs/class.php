@@ -4,12 +4,15 @@
         <link type="text/css" rel="stylesheet" href="<?= $stylesheet_path ?>"/>
     </head>
     <body>
-<?= $modifiers ?>
+<?= $class->modifiers() ?>
 <h1>
     <?= $class->name ?>
 </h1>
-        <? if ($class->parent_class) : ?>
+    <? if ($class->parent_class) : ?>
     extends <?= $class->parent_class ?>
+    <? endif; ?>
+    <? if ($class->implemented_interfaces) : ?>
+    implements <?= implode(' ', $class->implemented_interfaces) ?>
     <? endif; ?>
 <div class="free-form-text">
     <?= $class->free_form_text ?>

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ *
+ * @author Bence Eros <crystal@cyclonephp.com>
+ * @package CyDocs
+ */
 class CyDocs_Model_Annotation_Throws extends CyDocs_Model_Annotation {
 
     /**

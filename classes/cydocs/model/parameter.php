@@ -52,6 +52,9 @@ class CyDocs_Model_Parameter extends CyDocs_Model {
         if ($reflector->isOptional()) {
             try {
                 $this->default = $reflector->getDefaultValue();
+                if (is_string($this->default)) {
+                    $this->default = "'{$this->default}'"; // adding apostrophes to default string
+                }
             } catch (ReflectionException $ex) {
                 //print_r(xdebug_get_function_stack());
             }

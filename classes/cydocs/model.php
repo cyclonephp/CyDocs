@@ -133,6 +133,16 @@ abstract class CyDocs_Model {
     }
 
     public static function coderef_to_anchor($coderef_str) {
+        static $gen_arr_prefix = 'array<';
+        $gen_arr_prefix_len = strlen($gen_arr_prefix);
+        $coderef_str = trim($coderef_str);
+        // checking if it is an array<type> code reference.
+        if (substr($coderef_str, 0, $gen_arr_prefix_len) == $gen_arr_prefix // statrs with 'array<'
+                && $coderef_str{strlen($coderef_str) - 1} == '>') { // ends with '>'
+            $generic_param = substr($coderef_str, $gen_arr_prefix_len
+                    , strlen($coderef_str) - 1 - $gen_arr_prefix_len);
+            return 'array&lt;' . self::coderef_to_anchor($generic_param) . '&gt;';
+        }
         $root_path = CyDocs_Output_HTML_Library::path_to_root(CyDocs::inst()->current_class);
         $coderef = explode('::', $coderef_str);
         if (count($coderef) == 1) {

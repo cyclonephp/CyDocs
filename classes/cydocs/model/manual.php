@@ -1,6 +1,9 @@
 <?php
 
 /**
+ * Represents a library manual created by \c CyDocs_Text_Formatter::create_manual()
+ *
+ * The HTML output for the manual can be obtained as a string using \c CyDocs_Model_Manual::render()
  *
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs

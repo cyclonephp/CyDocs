@@ -67,21 +67,17 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
     }
 
     public function create_class_view(CyDocs_Model_Class $class) {
+        CyDocs::inst()->current_class = $class->name;
         $view = View::factory('cydocs/libs/class');
         $view->set('class', $class);
-        $modifiers = '';
-        if ($class->is_final) {
-            $modifiers .= 'final ';
+
+        foreach ($class->implemented_interfaces as &$intf) {
+            $intf = CyDocs_Model::coderef_to_anchor($intf->name);
         }
-        if ($class->is_abstract && ! $class->is_interface) {
-            $modifiers .= 'abstract ';
+
+        foreach ($class->properties as $prop) {
+            $prop->type = CyDocs_Model::coderef_to_anchor($prop->type);
         }
-        if ($class->is_interface) {
-            $modifiers .= 'interface';
-        } else {
-            $modifiers .= 'class';
-        }
-        $view->set('modifiers', $modifiers);
 
         $stylesheet_url = '../';
         $len = strlen($class->name);
@@ -93,7 +89,7 @@ class CyDocs_Output_HTML_Library implements CyDocs_Output {
         $view->set('properties', $this->create_property_list($class->properties));
         $stylesheet_url = $this->path_to_root($class->name) . 'stylesheet.css';
         $view->set('stylesheet_path', $stylesheet_url);
-
+        CyDocs::inst()->current_class = NULL;
         return $view;
     }
 

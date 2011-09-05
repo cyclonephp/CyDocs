@@ -186,4 +186,21 @@ class CyDocs_Model_Class extends CyDocs_Model {
         return $this->name;
     }
 
+    public function modifiers() {
+        $modifiers = '';
+        if ($this->is_final) {
+            $modifiers .= 'final ';
+        }
+        if ($this->is_abstract && ! $this->is_interface) {
+            $modifiers .= 'abstract ';
+        }
+        if ($this->is_interface) {
+            $modifiers .= 'interface';
+        } else {
+            $modifiers .= 'class';
+        }
+        $modifiers .= ' ';
+        return $modifiers;
+    }
+
 }
