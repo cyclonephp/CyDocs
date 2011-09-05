@@ -1,5 +1,5 @@
 <a name="method-<?= $method->name ?>"></a>
-    <p class="method-details">
+    <div class="method-details">
         <span class="modifiers"><?= $method->visibility ?></span>
         <span class="type"><?= $method->return_type ?></span>
         <span class="method-name"><?= $method->name ?></span>
@@ -21,4 +21,12 @@
     <span class="method-descr">
         <?= $method->free_form_text ?>
     </span>
-</p>
+    <? if ( ! empty($method->thrown_exceptions)) : ?>
+    <br/><strong>Thrown exceptions: </strong>
+    <ul class="thrown-exc-list">
+        <? foreach ($method->thrown_exceptions as $coderef => $descr) : ?>
+        <li><?= $coderef . ' ' . $descr ?></li>
+        <? endforeach; ?>
+    </ul>
+    <? endif; ?>
+</div>

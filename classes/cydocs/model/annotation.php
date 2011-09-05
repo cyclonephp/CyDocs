@@ -32,6 +32,7 @@ abstract class CyDocs_Model_Annotation {
             , 'var' => 'type'
             , 'type' => 'type'
             , 'access' => 'plain'
+            , 'throws' => 'throws'
         );
 
         $class = 'CyDocs_Model_Annotation_' . $class_suffixes[$annotation_name];
@@ -78,4 +79,8 @@ abstract class CyDocs_Model_Annotation {
     }
 
     protected abstract function init();
+
+    public function  __toString() {
+        return implode(' ', $this->_words);
+    }
 }

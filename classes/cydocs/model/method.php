@@ -69,6 +69,20 @@ class CyDocs_Model_Method extends CyDocs_Model {
      * @var string
      */
     public $return_type;
+
+    /**
+     * The exceptions thrown by the method. Exception class => description pairs
+     *
+     * @var array
+     */
+    public $thrown_exceptions = array();
+
+    /**
+     * The parsed comment of the method.
+     *
+     * @var CyDocs_Model_Comment
+     */
+    private $_comment;
     
 
     public function init() {
@@ -99,7 +113,7 @@ class CyDocs_Model_Method extends CyDocs_Model {
     public function post_loading() {
         parent::post_loading();
         $parser = new CyDocs_Parser($this->comment, $this); 
-        $comment = $parser->parse();
+        $this->_comment = $comment = $parser->parse();
         $return_annots = $comment->annotations_by_name(array('return', 'returns'));
         if (count($return_annots) > 1) {
             log_warning($this, 'ambigious return type for ' . $this->string_identifier());
@@ -112,7 +126,16 @@ class CyDocs_Model_Method extends CyDocs_Model {
 
         $this->return_type = CyDocs_Model::coderef_to_anchor($this->return_type);
 
-        $param_annots = $comment->annotations_by_name('param');
+        $this->process_param_annots();
+        $this->process_throws_annots();
+        
+        foreach ($this->parameters as $model) {
+            $model->post_loading();
+        }
+    }
+
+    private function process_param_annots() {
+        $param_annots = $this->_comment->annotations_by_name('param');
         foreach ($param_annots as $param_annot) {
             if ( ! $param_annot->formal_name) {
                 log_warning($this, 'invalid @param annotation at ' . $this->string_identifier());
@@ -132,8 +155,16 @@ class CyDocs_Model_Method extends CyDocs_Model {
             }
             $found_param_model->type = $param_annot->type;
         }
-        foreach ($this->parameters as $model) {
-            $model->post_loading();
+    }
+
+    private function process_throws_annots() {
+        $throws_annots = $this->_comment->annotations_by_name('throws');
+        foreach ($throws_annots as $throw_annot) {
+            if ( ! $throw_annot->exception_class)
+                continue;
+
+            $exc_coderef = CyDocs_Model::coderef_to_anchor($throw_annot->exception_class);
+            $this->thrown_exceptions[$exc_coderef] = $throw_annot->text;
         }
     }
 

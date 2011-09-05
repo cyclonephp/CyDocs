@@ -29,6 +29,7 @@ class CyDocs_Parser {
         , 'var'
         , 'type'
         , 'access'
+        , 'throws'
     );
 
     /**
