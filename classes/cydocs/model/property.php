@@ -81,6 +81,7 @@ class CyDocs_Model_Property extends CyDocs_Model {
         } else {
             self::$_log->add_error('unknown property type at ' . $this->class->name . '::' . $this->name);
         }
+        parent::process_links();
     }
 
     public function  string_identifier() {

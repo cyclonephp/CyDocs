@@ -179,6 +179,7 @@ class CyDocs_Model_Class extends CyDocs_Model {
         uasort($this->methods, function($a, $b) {
             return strcmp($a->name, $b->name);
         });
+        parent::process_links();
         CyDocs::inst()->current_class = NULL;
     }
 

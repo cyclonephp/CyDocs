@@ -16,36 +16,6 @@ abstract class CyDocs_Model {
     const VISIBILITY_READONLY = 'readonly';
 
     /**
-     * The name of the represented tool (a class name,  property name,
-     * method name or method parameter name).
-     *
-     * @var string
-     */
-    public $name;
-
-    /**
-     * The reflector instance that is examined. The properties of the subclasses
-     * will be populated using this property by the \c init() implementations.
-     *
-     * @var Reflector
-     */
-    public $reflector;
-
-    /**
-     * The raw text of the comment.
-     *
-     * @var string
-     */
-    public $comment;
-
-    /**
-     * The already HTML-formatted free-form text
-     *
-     * @var string
-     */
-    public $free_form_text;
-
-    /**
      * Object pool for the created class instances.
      * It's maintained by \c for_reflector() .
      *
@@ -77,6 +47,7 @@ abstract class CyDocs_Model {
      */
     protected static $_parameters = array();
 
+
     protected function  __construct(Reflector $reflector) {
         $this->reflector = $reflector;
     }
@@ -105,7 +76,7 @@ abstract class CyDocs_Model {
             return self::$_methods[$key];
         }
         if ($reflector instanceof ReflectionProperty) {
-            $key = $reflector->getDeclaringClass()->getName() . '::' . $reflector->getName();
+            $key = $reflector->getDeclaringClass()->getName() . '::$' . $reflector->getName();
             if (isset(self::$_properties[$key]))
                 return self::$_properties[$key];
             self::$_properties[$key] = new CyDocs_Model_Property($reflector);
@@ -164,6 +135,8 @@ abstract class CyDocs_Model {
 
         $candidate_key = $classname . '::' . $toolname;
 
+        $candidate_prop_key = $classname . '::$' . $toolname;
+
         if (isset(self::$_methods[$candidate_key])) {
             return '<a class="coderef" href="' . $root_path
                 . CyDocs_Output_HTML_Library::class_docs_file($classname)
@@ -175,11 +148,79 @@ abstract class CyDocs_Model {
                 . '#prop-' . $toolname
                 . '">'
                 . $coderef_str . '</a>';
+        } elseif (isset(self::$_properties[$candidate_prop_key])) {
+            return '<a class="coderef" href="' . $root_path
+                . CyDocs_Output_HTML_Library::class_docs_file($classname)
+                . '#prop-' . $toolname
+                . '">'
+                . $coderef_str . '</a>';
         }
         
 
         return $coderef_str;
     }
+
+    /**
+     * The name of the represented tool (a class name,  property name,
+     * method name or method parameter name).
+     *
+     * @var string
+     */
+    public $name;
+
+    /**
+     * The reflector instance that is examined. The properties of the subclasses
+     * will be populated using this property by the \c init() implementations.
+     *
+     * @var Reflector
+     */
+    public $reflector;
+
+    /**
+     * The raw text of the comment.
+     *
+     * @var string
+     */
+    public $comment;
+
+    /**
+     * The already HTML-formatted free-form text
+     *
+     * @var string
+     */
+    public $free_form_text;
+
+    /**
+     * The <code>uses</code> annotations found in the model comment.
+     * The annotation can be easily rendered, since \c CyDocs_Model_Annotation_Link::init()
+     * has already created the HTML <code>&lt;a&gt;</code> tag, and resolved
+     * the code reference (if any).
+     *
+     * @var array<CyDocs_Model_Annotation_Link>
+     */
+    public $uses = array();
+
+    /**
+     * The <code>usedby</code> annotations found in the model comment.
+     * The annotation can be easily rendered, since \c CyDocs_Model_Annotation_Link::init()
+     * has already created the HTML <code>&lt;a&gt;</code> tag, and resolved
+     * the code reference (if any).
+     *
+     * @var array<CyDocs_Model_Annotation_Link>
+     * @usedby CyDocs_Model::process_links()
+     */
+    public $usedby = array();
+
+    /**
+     * The <code>see</code> and <code>link</code> annotations found in the model comment.
+     * The annotation can be easily rendered, since \c CyDocs_Model_Annotation_Link::init()
+     * has already created the HTML <code>&lt;a&gt;</code> tag, and resolved
+     * the code reference (if any).
+     *
+     * @var array<CyDocs_Model_Annotation_Link>
+     */
+    public $link = array();
+
 
     public abstract function init();
 
@@ -198,6 +239,41 @@ abstract class CyDocs_Model {
 
         $this->free_form_text = CyDocs_Text_Formatter::comment_formatter($comment->text)
                 ->format();
+    }
+
+    /**
+     * Populates the following properties:
+     * <ul>
+     *  <li>uses</li>
+     *  <li>usedby</li>
+     *  <li>link</li>
+     *  <li>see</li>
+     * </ul>
+     *
+     * This method is recommended to be called from the \c post_loading()
+     * implementation of the subclasses.
+     * @uses CyDocs_Model::$uses
+     */
+    protected function process_links() {
+        if ( ! ($this->comment instanceof CyDocs_Model_Comment)) {
+        $parser = new CyDocs_Parser($this->comment, $this);
+        $comment = $parser->parse();
+        } else {
+            $comment = $this->comment;
+        }
+        $uses_annotations = $comment->annotations_by_name('uses');
+        foreach ($uses_annotations as $uses_ann) {
+            $this->uses []= $uses_ann;
+        }
+        $usedby_annotations = $comment->annotations_by_name('usedby');
+        foreach ($usedby_annotations as $usedby_ann) {
+            $this->usedby []= $usedby_ann;
+        }
+        $link_annots = $comment->annotations_by_name(array('link', 'see'));
+        foreach ($link_annots as $link_annot) {
+            $this->link []= $link_annot;
+        }
+
     }
 
 }

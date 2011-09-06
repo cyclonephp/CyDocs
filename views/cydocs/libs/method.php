@@ -29,4 +29,5 @@
         <? endforeach; ?>
     </ul>
     <? endif; ?>
+    <?= View::factory('cydocs/libs/links', array('model' => $method))->render() ?>
 </div>

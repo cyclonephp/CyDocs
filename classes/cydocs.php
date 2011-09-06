@@ -66,6 +66,9 @@ class CyDocs {
      * @param array $args
      */
     public function cli_api_bootstrap($args) {
+        if ($args['--measure']) {
+            $start_time = microtime(TRUE);
+        }
         $libs = explode(',', $args['--lib']);
         if ($libs[0] == 'all') {
             $libs = FileSystem::enabled_libs();
@@ -106,6 +109,13 @@ class CyDocs {
         }
         $output->generate_api();
         $output->generate_manual();
+        if ($args['--measure']) {
+            $time = microtime(TRUE) - $start_time;
+            
+            $mem_usage = (memory_get_peak_usage() / 1024) / 1024.0;
+            echo sprintf("execution time: %.2f sec\tmax. memoy usage: %.2f" . PHP_EOL
+                    , $time, $mem_usage);
+        }
     }
 
     public function load_classes($libs) {

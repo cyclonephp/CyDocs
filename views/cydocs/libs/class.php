@@ -17,6 +17,7 @@
 <div class="free-form-text">
     <?= $class->free_form_text ?>
 </div>
+<?= View::factory('cydocs/libs/links', array('model' => $class))->render() ?>
 <? if ( ! empty($class->subclasses)) : ?>
 <h4>Direct known subclasses: </h4>
     <ul>
@@ -59,14 +60,15 @@
 <div class="properties">
 <? foreach ($class->properties as $prop) : ?>
     <a name="prop-<?= $prop->name ?>"></a>
-    <p class="prop-details">
+    <span class="prop-details">
     <span class="modifiers"><?= $prop->visibility ?></span>
     <span class="type"><?= $prop->type ?></span>
     <span class="prop-name"><?= $prop->name ?></span>
     <span class="prop-descr">
     <?= $prop->free_form_text ?>
         </span>
-    </p>
+    <?= View::factory('cydocs/libs/links', array('model' => $prop))->render() ?>
+    </span>
 <? endforeach; ?>
 </div>
 <? endif; ?>

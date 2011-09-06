@@ -132,6 +132,7 @@ class CyDocs_Model_Method extends CyDocs_Model {
         foreach ($this->parameters as $model) {
             $model->post_loading();
         }
+        parent::process_links();
     }
 
     private function process_param_annots() {

@@ -30,7 +30,7 @@ return array(
                         'parameter' => '<path>',
                         'alias' => '-s',
                         'descr' => 'the stylesheet file that should be applied to the output',
-                        'default' => FileSystem::get_root_path('cydocs') . 'assets/css/default.css'
+                        'default' => FileSystem::get_root_path('cydocs') . 'assets/css/cydocs/default.css'
                     ),
                     '--pdf' => array(
                         'alias' => '-p',
@@ -43,6 +43,12 @@ return array(
                         'default' => FALSE,
                         'alias' => '-f',
                         'descr' => 'the generator removes all existing docs directories if passed'
+                    ),
+                    '--measure' => array(
+                        'parameter' => NULL,
+                        'default' => FALSE,
+                        'alias' => '-m',
+                        'descr' => 'flag marking if the execution time and memory usage'
                     )
                 )
             )

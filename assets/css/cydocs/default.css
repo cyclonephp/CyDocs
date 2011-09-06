@@ -88,3 +88,15 @@ ul.toc a:hover {
 .lnk-manual a {
     text-decoration: none;
 }
+
+.links {
+    font-size: 80%;
+}
+
+.links ul {
+    list-style-type: none;
+}
+
+.links a {
+    text-decoration: none;
+}
