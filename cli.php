@@ -10,7 +10,7 @@ return array(
                 'arguments' => array(
                     '--root-dir' => array(
                         'alias' => '-r',
-                        'default' => DOCROOT . 'docs/',
+                        'default' => \cyclone\DOCROOT . 'docs/',
                         'parameter' => '<root-dir>',
                         'descr' => 'the root directory of the generated documentation'
                     ),
