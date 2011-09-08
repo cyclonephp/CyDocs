@@ -103,6 +103,11 @@ class CyDocs_Output_HTML implements CyDocs_Output {
             $lib_section->text = $lib_manual->text;
             $rval->sections []= $lib_section;
         }
+        if (CyDocs::inst()->preface !== FALSE) {
+            $preface = file_get_contents(CyDocs::inst()->preface);
+            $rval->text = $preface . $rval->text;
+        }
+        $rval->title = CyDocs::inst()->title;
         return $rval;
     }
 

@@ -49,6 +49,18 @@ return array(
                         'default' => FALSE,
                         'alias' => '-m',
                         'descr' => 'flag marking if the execution time and memory usage'
+                    ),
+                    '--title' => array(
+                        'parameter' => '<title>',
+                        'alias' => '-t',
+                        'default' => '',
+                        'descr' => 'The title of the generated documentation. Only used if the generation goes for multiple libraries.'
+                    ),
+                    '--preface' => array(
+                        'parameter' => '<html-file-containing-preface>',
+                        'alias' => '-p',
+                        'default' => FALSE,
+                        'descr' => 'The main page of the output. Only used if the generation goes for multiple libraries.'
                     )
                 )
             )

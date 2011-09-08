@@ -20,7 +20,7 @@ class CyDocs {
      *
      * @var array
      */
-    private static $_enabled_attributes = array('internal');
+    private static $_enabled_attributes = array('internal', 'title', 'preface');
 
     /**
      * @return CyDocs
@@ -37,6 +37,20 @@ class CyDocs {
      * @var boolean
      */
     private $_internal;
+
+    /**
+     * The documentation title passed by the <code>--title</code> CLI argument.
+     *
+     * @var string
+     */
+    private $_title;
+
+    /**
+     * The preface passed by the <code>--preface</code> CLI argument.
+     * 
+     * @var string
+     */
+    private $_preface;
 
     /**
      * The name of the class that is currently under processing.
@@ -69,6 +83,8 @@ class CyDocs {
         if ($args['--measure']) {
             $start_time = microtime(TRUE);
         }
+        $this->_title = $args['--title'];
+        $this->_preface = $args['--preface'];
         $libs = explode(',', $args['--lib']);
         if ($libs[0] == 'all') {
             $libs = FileSystem::enabled_libs();
