@@ -1,11 +1,15 @@
 <?php
 
+namespace cyclone\docs\model;
+
+use cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Library {
+class LibraryModel {
 
     /**
      * Object pool of the created library instances.
@@ -14,9 +18,9 @@ class CyDocs_Model_Library {
      */
     private static $_instances = array();
 
-    public static function add_class(CyDocs_Model_Class $class) {
+    public static function add_class(ClassModel $class) {
         if (NULL === $class->library)
-            throw new CyDocs_Exception("can't add class '{$class->name}' to any library");
+            throw new docs\Exception("can't add class '{$class->name}' to any library");
 
         $libname = trim($class->library);
         if ( ! isset(self::$_instances[$libname]))
@@ -27,7 +31,7 @@ class CyDocs_Model_Library {
 
     public static function get_by_name($libname) {
         if ( ! isset(self::$_instances[$libname]))
-            throw new CyDocs_Exception("library '$libname' does not exist");
+            throw new docs\Exception("library '$libname' does not exist");
 
         return self::$_instances[$libname];
     }
@@ -53,7 +57,7 @@ class CyDocs_Model_Library {
 
     public static function fire_post_load() {
         foreach (self::$_instances as $lib) {
-            if ($lib instanceof CyDocs_Model_Library) {
+            if ($lib instanceof LibraryModel) {
                 $lib->post_loading();
             }
         }

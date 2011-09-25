@@ -1,11 +1,16 @@
 <?php
 
+namespace cyclone\docs\model;
+
+use cyclone\docs;
+use cyclone as cy;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Property extends CyDocs_Model {
+class PropertyModel extends AbstractModel {
 
     /**
      * The logger instance.
@@ -47,7 +52,7 @@ class CyDocs_Model_Property extends CyDocs_Model {
             parent::__construct($reflector);
         }
         if (NULL === self::$_log) {
-            self::$_log = Log::for_class($this);
+            self::$_log = cy\Log::for_class($this);
         }
     }
 
@@ -55,31 +60,31 @@ class CyDocs_Model_Property extends CyDocs_Model {
         $this->name = $this->reflector->getName();
         $this->comment = $this->reflector->getDocComment();
         $this->is_static = $this->reflector->isStatic();
-        $this->class = CyDocs_Model::for_reflector($this->reflector->getDeclaringClass());
+        $this->class = AbstractModel::for_reflector($this->reflector->getDeclaringClass());
         if ($this->reflector->isPublic()) {
-            $this->visibility = CyDocs_Model::VISIBILITY_PUBLIC;
+            $this->visibility = AbstractModel::VISIBILITY_PUBLIC;
         }
         if ($this->reflector->isProtected()) {
-            $this->visibility = CyDocs_Model::VISIBILITY_PROTECTED;
+            $this->visibility = AbstractModel::VISIBILITY_PROTECTED;
         }
         if ($this->reflector->isPrivate()) {
-            $this->visibility = CyDocs_Model::VISIBILITY_PRIVATE;
+            $this->visibility = AbstractModel::VISIBILITY_PRIVATE;
         }
     }
 
     public function  post_loading() {
         parent::post_loading();
-        $parser = new CyDocs_Parser($this->comment, $this);
+        $parser = new docs\Parser($this->comment, $this);
         $comment = $parser->parse();
         $var_annots = $comment->annotations_by_name('var');
         if (count($var_annots) > 1) {
-            self::$_log->add_error('ambiguous property type at ' . $this->class->name . '::' . $this->name);
+            //self::$_log->add_error('ambiguous property type at ' . $this->class->name . '::' . $this->name);
         }
         if (count($var_annots) >= 1) {
             $var_annot = $var_annots[0];
             $this->type = $var_annot->type;
         } else {
-            self::$_log->add_error('unknown property type at ' . $this->class->name . '::' . $this->name);
+            //self::$_log->add_error('unknown property type at ' . $this->class->name . '::' . $this->name);
         }
         parent::process_links();
     }

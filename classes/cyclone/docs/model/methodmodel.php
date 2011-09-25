@@ -1,11 +1,15 @@
 <?php
 
+namespace cyclone\docs\model;
+
+use cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Method extends CyDocs_Model {
+class MethodModel extends AbstractModel {
 
     /**
      * Flag marking that the represented method is static or not.
@@ -59,7 +63,7 @@ class CyDocs_Model_Method extends CyDocs_Model {
     /**
      * The declared parameters of the represented method.
      *
-     * @var array<CyDocs_Model_Parameter>
+     * @var array<ParameterModel>
      */
     public $parameters = array();
 
@@ -89,30 +93,30 @@ class CyDocs_Model_Method extends CyDocs_Model {
         $reflector = $this->reflector;
         $this->is_static = $reflector->isStatic();
         $this->is_abstract = $reflector->isAbstract();
-        $this->class = CyDocs_Model::for_reflector($reflector->getDeclaringClass());
+        $this->class = AbstractModel::for_reflector($reflector->getDeclaringClass());
         $this->name = $reflector->getName();
         $this->comment = $reflector->getDocComment();
         if ($reflector->isPublic()) {
-            $this->visibility = CyDocs_Model::VISIBILITY_PUBLIC;
+            $this->visibility = AbstractModel::VISIBILITY_PUBLIC;
         }
         if ($reflector->isProtected()) {
-            $this->visibility = CyDocs_Model::VISIBILITY_PROTECTED;
+            $this->visibility = AbstractModel::VISIBILITY_PROTECTED;
         }
         if ($reflector->isPrivate()) {
-            $this->visibility = CyDocs_Model::VISIBILITY_PRIVATE;
+            $this->visibility = AbstractModel::VISIBILITY_PRIVATE;
         }
 
         $this->is_constructor = $reflector->isConstructor();
         $this->is_destructor = $reflector->isDestructor();
 
         foreach ($reflector->getParameters() as $ref_param) {
-            $this->parameters []= CyDocs_Model::for_reflector($ref_param);
+            $this->parameters []= AbstractModel::for_reflector($ref_param);
         }
     }
 
     public function post_loading() {
         parent::post_loading();
-        $parser = new CyDocs_Parser($this->comment, $this); 
+        $parser = new docs\Parser($this->comment, $this);
         $this->_comment = $comment = $parser->parse();
         $return_annots = $comment->annotations_by_name(array('return', 'returns'));
         if (count($return_annots) > 1) {
@@ -124,7 +128,7 @@ class CyDocs_Model_Method extends CyDocs_Model {
             $this->return_type = 'void';
         }
 
-        $this->return_type = CyDocs_Model::coderef_to_anchor($this->return_type);
+        $this->return_type = AbstractModel::coderef_to_anchor($this->return_type);
 
         $this->process_param_annots();
         $this->process_throws_annots();
@@ -135,9 +139,30 @@ class CyDocs_Model_Method extends CyDocs_Model {
         parent::process_links();
     }
 
+    public function get_param_annot_idx(annotation\ParamAnnotation $annot) {
+        $idx = 0;
+        $param_annots = $this->_comment->annotations_by_name('param');
+        foreach ($param_annots as $p_annot) {
+            if ($p_annot === $annot)
+                return $idx;
+            ++$idx;
+        }
+        throw new docs\Exception("$annot does not seem to be an annotation of " . $this->string_identifier());
+    }
+
     private function process_param_annots() {
         $param_annots = $this->_comment->annotations_by_name('param');
+        $i = 0;
         foreach ($param_annots as $param_annot) {
+            if ( ! $param_annot->formal_name) {
+                $ref_params = $this->reflector->getParameters();
+                if ( ! isset($ref_params[$i])) {
+                    log_warning($this, $this->string_identifier() . ' has ' . count($ref_params) . 'parameters, but ' .count($param_annots) . ' @param annotations found');
+                } else {
+                    $param_annot->formal_name = $ref_params[$i]->getName();
+                }
+            }
+
             if ( ! $param_annot->formal_name) {
                 log_warning($this, 'invalid @param annotation at ' . $this->string_identifier());
                 continue;
@@ -155,6 +180,7 @@ class CyDocs_Model_Method extends CyDocs_Model {
                 continue;
             }
             $found_param_model->type = $param_annot->type;
+            ++$i;
         }
     }
 
@@ -164,7 +190,7 @@ class CyDocs_Model_Method extends CyDocs_Model {
             if ( ! $throw_annot->exception_class)
                 continue;
 
-            $exc_coderef = CyDocs_Model::coderef_to_anchor($throw_annot->exception_class);
+            $exc_coderef = AbstractModel::coderef_to_anchor($throw_annot->exception_class);
             $this->thrown_exceptions[$exc_coderef] = $throw_annot->text;
         }
     }

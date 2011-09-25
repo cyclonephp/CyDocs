@@ -1,16 +1,18 @@
 <?php
 
+use cyclone as cy;
+
 return array(
     'docs' => array(
         'descr' => 'Documentation generator tool for CyclonePHP',
         'commands' => array(
             'api' => array(
                 'descr' => 'generates API docs for the classes in the enables libraries',
-                'callback' => array(CyDocs::inst(), 'cli_api_bootstrap'),
+                'callback' => array(cy\Docs::inst(), 'cli_api_bootstrap'),
                 'arguments' => array(
                     '--root-dir' => array(
                         'alias' => '-r',
-                        'default' => \cyclone\DOCROOT . 'docs/',
+                        'default' => cy\DOCROOT . 'docs/',
                         'parameter' => '<root-dir>',
                         'descr' => 'the root directory of the generated documentation'
                     ),
@@ -30,7 +32,7 @@ return array(
                         'parameter' => '<path>',
                         'alias' => '-s',
                         'descr' => 'the stylesheet file that should be applied to the output',
-                        'default' => FileSystem::get_root_path('cydocs') . 'assets/css/cydocs/default.css'
+                        'default' => cy\FileSystem::get_root_path('cydocs') . 'assets/css/cydocs/default.css'
                     ),
                     '--pdf' => array(
                         'alias' => '-p',

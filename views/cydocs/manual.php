@@ -9,7 +9,7 @@
 
 <h2>Table of Contents</h2>
 
-<?= View::factory('cydocs/manual/toc', array(
+<?= cyclone\View::factory('cydocs/manual/toc', array(
     'sections' => $manual->sections
 ))->render() ?>
 

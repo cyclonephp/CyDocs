@@ -1,11 +1,15 @@
 <?php
 
+namespace cyclone\docs\model\annotation;
+
+use cyclone\docs\model;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Annotation_Link extends CyDocs_Model_Annotation {
+class LinkAnnotation extends AbstractAnnotation {
 
     public $link;
 
@@ -19,7 +23,7 @@ class CyDocs_Model_Annotation_Link extends CyDocs_Model_Annotation {
         if (strpos($this->link, '://') !== FALSE) {
             $this->link = '<a href="' . $this->link . '">' . $this->link . '</a>';
         } else {
-            $this->link = CyDocs_Model::coderef_to_anchor($this->link);
+            $this->link = model\AbstractModel::coderef_to_anchor($this->link);
         }
         $this->text = implode(' ', $this->_words);
     }

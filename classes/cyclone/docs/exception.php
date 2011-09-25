@@ -1,8 +1,10 @@
 <?php
 
+namespace cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Exception extends Exception {}
+class Exception extends \Exception {}

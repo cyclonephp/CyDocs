@@ -1,11 +1,17 @@
 <?php
 
+namespace cyclone\docs\model;
+
+use cyclone\docs;
+
+use cyclone as cy;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-abstract class CyDocs_Model {
+abstract class AbstractModel {
 
     const VISIBILITY_PUBLIC = 'public';
 
@@ -48,7 +54,7 @@ abstract class CyDocs_Model {
     protected static $_parameters = array();
 
 
-    protected function  __construct(Reflector $reflector) {
+    protected function  __construct(\Reflector $reflector) {
         $this->reflector = $reflector;
     }
 
@@ -58,43 +64,43 @@ abstract class CyDocs_Model {
      * @param Reflector $reflector
      * @return CyDocs_Model
      */
-    public static function for_reflector(Reflector $reflector) {
-        if ($reflector instanceof ReflectionClass) {
+    public static function for_reflector(\Reflector $reflector) {
+        if ($reflector instanceof \ReflectionClass) {
             $key = $reflector->getName();
             if (isset(self::$_classes[$key]))
                 return self::$_classes[$key];
-            self::$_classes[$key] = new CyDocs_Model_Class($reflector);
+            self::$_classes[$key] = new ClassModel($reflector);
             self::$_classes[$key]->init();
             return self::$_classes[$key];
         }
-        if ($reflector instanceof ReflectionMethod) {
+        if ($reflector instanceof \ReflectionMethod) {
             $key = $reflector->getDeclaringClass()->getName() . '::' . $reflector->getName() . '()';
             if (isset(self::$_methods[$key]))
                 return self::$_methods[$key];
-            self::$_methods[$key] = new CyDocs_Model_Method($reflector);
+            self::$_methods[$key] = new MethodModel($reflector);
             self::$_methods[$key]->init();
             return self::$_methods[$key];
         }
-        if ($reflector instanceof ReflectionProperty) {
+        if ($reflector instanceof \ReflectionProperty) {
             $key = $reflector->getDeclaringClass()->getName() . '::$' . $reflector->getName();
             if (isset(self::$_properties[$key]))
                 return self::$_properties[$key];
-            self::$_properties[$key] = new CyDocs_Model_Property($reflector);
+            self::$_properties[$key] = new PropertyModel($reflector);
             self::$_properties[$key]->init();
             return self::$_properties[$key];
         }
-        if ($reflector instanceof ReflectionParameter) {
+        if ($reflector instanceof \ReflectionParameter) {
             $method_key = $reflector->getDeclaringClass()->getName() . '::' . $reflector->getName();
             if ( ! isset(self::$_parameters[$method_key])) {
                 self::$_parameters[$method_key] = array();
             }
             if (isset(self::$_parameters[$method_key][$reflector->getName()]))
                 return self::$_parameters[$method_key][$reflector->getName()];
-            self::$_parameters[$method_key][$reflector->getName()] = new CyDocs_Model_Parameter($reflector);
+            self::$_parameters[$method_key][$reflector->getName()] = new ParameterModel($reflector);
             self::$_parameters[$method_key][$reflector->getName()]->init();
             return self::$_parameters[$method_key][$reflector->getName()];
         }
-        throw new CyDocs_Exception('no CyDocs_Model implementation for ' . get_class($reflector));
+        throw new docs\Exception('no cyclone\docs\model\AbstractModel implementation for ' . get_class($reflector));
     }
 
     public static function fire_post_load() {
@@ -114,15 +120,15 @@ abstract class CyDocs_Model {
                     , strlen($coderef_str) - 1 - $gen_arr_prefix_len);
             return 'array&lt;' . self::coderef_to_anchor($generic_param) . '&gt;';
         }
-        $root_path = CyDocs_Output_HTML_Library::path_to_root(CyDocs::inst()->current_class);
+        $root_path = docs\output\html\LibraryOutput::path_to_root(cy\Docs::inst()->current_class);
         $coderef = explode('::', $coderef_str);
         if (count($coderef) == 1) {
-            $classname = CyDocs::inst()->current_class;
+            $classname = cy\Docs::inst()->current_class;
             $toolname = $coderef[0];
             // the tool name can be a class name
             if (isset(self::$_classes[$toolname])) {
                 return '<a class="coderef" href="' . $root_path
-                . CyDocs_Output_HTML_Library::class_docs_file($toolname) . '">'
+                . docs\output\html\LibraryOutput::class_docs_file($toolname) . '">'
                 . $coderef_str . '</a>';
             }
         } elseif (count($coderef) == 2) {
@@ -139,18 +145,18 @@ abstract class CyDocs_Model {
 
         if (isset(self::$_methods[$candidate_key])) {
             return '<a class="coderef" href="' . $root_path
-                . CyDocs_Output_HTML_Library::class_docs_file($classname)
+                . docs\output\html\LibraryOutput::class_docs_file($classname)
                 . '#method-' . $toolname
                 . '">' . $coderef_str . '</a>';
         } elseif (isset(self::$_properties[$candidate_key])) {
             return '<a class="coderef" href="' . $root_path
-                . CyDocs_Output_HTML_Library::class_docs_file($classname)
+                . docs\output\html\LibraryOutput::class_docs_file($classname)
                 . '#prop-' . $toolname
                 . '">'
                 . $coderef_str . '</a>';
         } elseif (isset(self::$_properties[$candidate_prop_key])) {
             return '<a class="coderef" href="' . $root_path
-                . CyDocs_Output_HTML_Library::class_docs_file($classname)
+                . docs\output\html\LibraryOutput::class_docs_file($classname)
                 . '#prop-' . $toolname
                 . '">'
                 . $coderef_str . '</a>';
@@ -234,10 +240,10 @@ abstract class CyDocs_Model {
         if (NULL === $this->comment)
             return;
 
-        $parser = new CyDocs_Parser($this->comment, $this);
+        $parser = new docs\Parser($this->comment, $this);
         $comment = $parser->parse();
 
-        $this->free_form_text = CyDocs_Text_Formatter::comment_formatter($comment->text)
+        $this->free_form_text = docs\Formatter::comment_formatter($comment->text)
                 ->format();
     }
 
@@ -255,8 +261,8 @@ abstract class CyDocs_Model {
      * @uses CyDocs_Model::$uses
      */
     protected function process_links() {
-        if ( ! ($this->comment instanceof CyDocs_Model_Comment)) {
-        $parser = new CyDocs_Parser($this->comment, $this);
+        if ( ! ($this->comment instanceof CommentModel)) {
+        $parser = new docs\Parser($this->comment, $this);
         $comment = $parser->parse();
         } else {
             $comment = $this->comment;

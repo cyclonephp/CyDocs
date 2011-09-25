@@ -1,11 +1,13 @@
 <?php
 
+namespace cyclone\docs\model;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Parameter extends CyDocs_Model {
+class ParameterModel extends AbstractModel {
 
     /**
      * The type of the parameter.
@@ -55,7 +57,7 @@ class CyDocs_Model_Parameter extends CyDocs_Model {
                 if (is_string($this->default)) {
                     $this->default = "'{$this->default}'"; // adding apostrophes to default string
                 }
-            } catch (ReflectionException $ex) {
+            } catch (\ReflectionException $ex) {
                 //print_r(xdebug_get_function_stack());
             }
             if (NULL === $reflector->getDefaultValue()) {
@@ -75,12 +77,12 @@ class CyDocs_Model_Parameter extends CyDocs_Model {
         if ($reflector->isPassedByReference() && ! $reflector->getClass()) {
             $this->by_ref = TRUE;
         }
-        $this->method = CyDocs_Model::for_reflector($reflector->getDeclaringFunction());
+        $this->method = AbstractModel::for_reflector($reflector->getDeclaringFunction());
     }
 
     public function  post_loading() {
         parent::post_loading();
-        $this->type = CyDocs_Model::coderef_to_anchor($this->type);
+        $this->type = AbstractModel::coderef_to_anchor($this->type);
     }
 
     public function  string_identifier() {

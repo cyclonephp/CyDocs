@@ -1,11 +1,13 @@
 <?php
 
+namespace cyclone\docs\model\annotation;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Annotation_Plain extends CyDocs_Model_Annotation {
+class PlainAnnotation extends AbstractAnnotation {
 
     protected function init() {
         $this->text = implode(' ', $this->_words);

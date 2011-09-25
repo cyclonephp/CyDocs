@@ -1,10 +1,15 @@
 <?php
 
+namespace cyclone\docs;
+
+use cyclone as cy;
+use cyclone\docs;
+use cyclone\docs\model;
 /**
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package cydocs
  */
-class CyDocs_Text_Formatter {
+class Formatter {
 
     /**
      * Retrurns a formatter that is able to format the lines as library manual text.
@@ -16,7 +21,7 @@ class CyDocs_Text_Formatter {
      * @usedby CyDocs_Output_HTML_Library::generate_manual()
      */
     public static function manual_formatter($text) {
-        return new CyDocs_Text_Formatter($text, array(
+        return new Formatter($text, array(
             'c',
             'code',
 //            'endcode',
@@ -35,7 +40,7 @@ class CyDocs_Text_Formatter {
      * @return CyDocs_Text_Formatter
      */
     public static function comment_formatter($text) {
-        return new CyDocs_Text_Formatter($text, array(
+        return new Formatter($text, array(
             'c',
             'code',
             'internal'
@@ -164,7 +169,7 @@ class CyDocs_Text_Formatter {
     private function tag_coderef($tag) {
         $this->read_whitespaces();
         $coderef = $this->next_token();
-        return CyDocs_Model::coderef_to_anchor($coderef) . ' '; // :)
+        return cy\docs\model\AbstractModel::coderef_to_anchor($coderef) . ' '; // :)
     }
 
     private function tag_code($tag) {
@@ -193,7 +198,7 @@ class CyDocs_Text_Formatter {
     }
 
     private function tag_internal($tag) {
-        if ( ! CyDocs::inst()->internal) {
+        if ( ! cy\Docs::inst()->internal) {
             $this->_idx = $this->_length; // skipping the remaining (internal) part
         }
         return '';
@@ -201,16 +206,16 @@ class CyDocs_Text_Formatter {
 
     private function tag_section($tag) {
         if (NULL === $this->_manual)
-            throw new CyDocs_Exception("@section tags are not enabled in comment texts");
+            throw new docs\Exception("@section tags are not enabled in comment texts");
 
-        $section = new CyDocs_Model_Manual_Section;
+        $section = new model\SectionModel;
         $this->_manual->sections []= $section;
         $this->_current_section = $section;
 
         $this->parse_section_line($section);
     }
 
-    private function parse_section_line(CyDocs_Model_Manual_Section $section) {
+    private function parse_section_line(model\SectionModel $section) {
         $section_line = '';
         for(; $this->_idx < $this->_length; ++$this->_idx) {
             $char = $this->_text[$this->_idx];
@@ -240,7 +245,7 @@ class CyDocs_Text_Formatter {
         if (NULL === $this->_current_section)
              throw new CyDocs_Exception("@subsection tags should not appear before at least one @section tag");
 
-        $subsection = new CyDocs_Model_Manual_Section;
+        $subsection = new model\SectionModel;
         $this->_current_section->sections []= $subsection;
         $this->_current_subsection = $subsection;
 
@@ -295,7 +300,7 @@ class CyDocs_Text_Formatter {
      * @return CyDocs_Model_Manual
      */
     public function create_manual() {
-        $this->_manual = new CyDocs_Model_Manual;
+        $this->_manual = new model\ManualModel;
         $this->_manual->text = $this->format();
         return $this->_manual;
     }

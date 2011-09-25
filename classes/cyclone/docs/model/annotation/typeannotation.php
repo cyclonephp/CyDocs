@@ -1,11 +1,13 @@
 <?php
 
+namespace cyclone\docs\model\annotation;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Annotation_Type extends CyDocs_Model_Annotation {
+class TypeAnnotation extends AbstractAnnotation {
 
     /**
      * The formal name of the tool (property or method parameter) that's type

@@ -1,11 +1,13 @@
 <?php
 
+namespace cyclone\docs\model\annotation;
+
 /**
  *
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Annotation_Throws extends CyDocs_Model_Annotation {
+class ThrowsAnnotation extends AbstractAnnotation {
 
     /**
      * The class of the thrown annotation

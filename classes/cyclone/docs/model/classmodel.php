@@ -1,11 +1,16 @@
 <?php
 
+namespace cyclone\docs\model;
+
+use cyclone as cy;
+use cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Class extends CyDocs_Model {
+class ClassModel extends AbstractModel {
 
     /**
      * The library that the represented class belongs to.
@@ -85,9 +90,9 @@ class CyDocs_Model_Class extends CyDocs_Model {
 
     public function init() {
         $reflector = $this->reflector;
-        CyDocs::inst()->current_class = $this->name = $reflector->getName();
+        cy\Docs::inst()->current_class = $this->name = $reflector->getName();
         if (($parent_class = $reflector->getParentClass()) != FALSE && ! $parent_class->isInternal()) {
-            $this->parent_class = CyDocs_Model::for_reflector($parent_class);
+            $this->parent_class = AbstractModel::for_reflector($parent_class);
         }
         $this->is_final = $reflector->isFinal();
         $this->is_abstract = $reflector->isAbstract();
@@ -95,10 +100,10 @@ class CyDocs_Model_Class extends CyDocs_Model {
         $this->comment = $reflector->getDocComment();
         $this->reflector = $reflector;
 
-        $exclude_private = ! CyDocs::inst()->internal;
+        $exclude_private = ! cy\Docs::inst()->internal;
         foreach ($reflector->getInterfaces() as $intf) {
             if ( ! $intf->isInternal()) {
-                $this->implemented_interfaces []= CyDocs_Model::for_reflector($intf);
+                $this->implemented_interfaces []= AbstractModel::for_reflector($intf);
             }
         }
         foreach ($reflector->getConstants() as $name => $value) {
@@ -110,34 +115,33 @@ class CyDocs_Model_Class extends CyDocs_Model {
         foreach ($reflector->getProperties() as $ref_prop) {
             if ($ref_prop->getDeclaringClass() == $reflector
                     && ! ($exclude_private && $ref_prop->isPrivate())) {
-                $this->properties []= CyDocs_Model::for_reflector($ref_prop);
+                $this->properties []= AbstractModel::for_reflector($ref_prop);
             }
         }
         foreach ($reflector->getMethods() as $ref_method) {
             if ($ref_method->getDeclaringClass() == $reflector
                     && ! ($exclude_private && $ref_method->isPrivate())) {
-                $this->methods []= CyDocs_Model::for_reflector($ref_method);
+                $this->methods []= AbstractModel::for_reflector($ref_method);
             }
         }
-        CyDocs::inst()->current_class = NULL;
+        cy\Docs::inst()->current_class = NULL;
     }
 
     public function  post_loading() {
         parent::post_loading();
-        CyDocs::inst()->current_class = $this->name;
-        $parser = new CyDocs_Parser($this->comment, $this);
+        cy\Docs::inst()->current_class = $this->name;
+        $parser = new docs\Parser($this->comment, $this);
         $comment = $this->comment = $parser->parse();
-        //var_dump($comment->annotations);
         $prop_annots = $comment->annotations_by_name(array('property', 'property-read'));
         foreach ($prop_annots as $prop_annot) {
-            $prop = new CyDocs_Model_Property;
+            $prop = new PropertyModel;
             $prop->name = $prop_annot->formal_name;
             $prop->type = $prop_annot->type;
             $prop->class = $this;
             if ($prop_annot->name == 'property-read') {
-                $prop->visibility = CyDocs_Model::VISIBILITY_READONLY;
+                $prop->visibility = AbstractModel::VISIBILITY_READONLY;
             } else {
-                $prop->visibility = CyDocs_Model::VISIBILITY_PUBLIC;
+                $prop->visibility = AbstractModel::VISIBILITY_PUBLIC;
             }
             $this->properties []= $prop;
             $obj_pool_key = $this->name . '::' . $prop->name;
@@ -150,25 +154,28 @@ class CyDocs_Model_Class extends CyDocs_Model {
                 break;
             case 1:
                 $this->library = strtolower($pkg_annots[0]->text);
-                CyDocs_Model_Library::add_class($this);
+                LibraryModel::add_class($this);
                 break;
             default:
                 log_warning($this, 'multiple @package annotations for class ' . $this->name);
         }
         foreach (self::$_classes as $class) {
             if ($class->parent_class === $this) {
-                $this->subclasses []= CyDocs_Model::coderef_to_anchor($class->name);
+                $this->subclasses []= AbstractModel::coderef_to_anchor($class->name);
             }
         }
 
         foreach ($this->properties as $model) {
+            //echo get_class($model) . "\n";
+            //echo "post-loading " . $model->string_identifier() . "\n";
             $model->post_loading();
         }
+        
         foreach ($this->methods as $model) {
             $model->post_loading();
         }
         if ( ! is_null($this->parent_class)) {
-            $this->parent_class = CyDocs_Model::coderef_to_anchor($this->parent_class->name);
+            $this->parent_class = AbstractModel::coderef_to_anchor($this->parent_class->name);
         }
         uasort($this->subclasses, function($a, $b) {
             return strcmp($a, $b);
@@ -180,7 +187,7 @@ class CyDocs_Model_Class extends CyDocs_Model {
             return strcmp($a->name, $b->name);
         });
         parent::process_links();
-        CyDocs::inst()->current_class = NULL;
+        cy\Docs::inst()->current_class = NULL;
     }
 
     public function  string_identifier() {

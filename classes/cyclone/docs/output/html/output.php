@@ -1,12 +1,17 @@
 <?php
 
+namespace cyclone\docs\output\html;
+
+use cyclone\docs;
+use cyclone as cy;
+
 
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Output_HTML implements CyDocs_Output {
+class Output implements docs\Output {
 
     /**
      * The absolute path of the root directory of the generated documentation.
@@ -49,7 +54,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
 
     public function generate_api() {
         mkdir($this->_root_dir . 'libs/');
-        $index_view = View::factory('cydocs/index');
+        $index_view = cy\View::factory('cydocs/index');
         file_put_contents($this->_root_dir . 'index.html', $index_view->render());
         copy($this->_stylesheet, $this->_root_dir . 'stylesheet.css');
 
@@ -58,7 +63,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
         foreach ($this->_lib_models as $model) {
             $libroot = $this->_root_dir . 'libs/' . $model->name . '/';
             mkdir($libroot);
-            $lib_output = new CyDocs_Output_HTML_Library(
+            $lib_output = new LibraryOutput(
                 $libroot, $model, $this->_stylesheet);
             $lib_output->generate_api();
             $lib_output->generate_manual();
@@ -71,7 +76,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
         foreach ($this->_lib_models as $lib_model) {
             $libs_data[$lib_model->name] = $this->_root_dir . 'libs/' . $lib_model->name . '/classes.html';
         }
-        $liblist_view = View::factory('cydocs/libs'
+        $liblist_view = cy\View::factory('cydocs/libs'
                 , array('libs' => $libs_data));
         file_put_contents($this->_root_dir . 'libs.html', $liblist_view->render());
     }
@@ -82,7 +87,7 @@ class CyDocs_Output_HTML implements CyDocs_Output {
             $lib_root_path = FileSystem::get_root_path($model->name);
             $manual_file = $lib_root_path . 'manual/manual.txt';
             if (file_exists($manual_file)) {
-                $lib_manuals[$model->name] = CyDocs_Text_Formatter::manual_formatter(file_get_contents($manual_file))
+                $lib_manuals[$model->name] = docs\Formatter::manual_formatter(file_get_contents($manual_file))
                         ->create_manual();
                 $lib_manuals[$model->name]->title = $model->name;
             } else {
@@ -94,20 +99,20 @@ class CyDocs_Output_HTML implements CyDocs_Output {
     }
 
     public function merge_lib_manuals(array $lib_manuals) {
-        $rval = new CyDocs_Model_Manual;
+        $rval = new docs\model\ManualModel;
         foreach ($lib_manuals as $lib_manual) {
-            $lib_section = new CyDocs_Model_Manual_Section;
+            $lib_section = new docs\model\SectionModel;
             $lib_section->id = $lib_manual->title;
             $lib_section->title = $lib_manual->title;
             $lib_section->sections = $lib_manual->sections;
             $lib_section->text = $lib_manual->text;
             $rval->sections []= $lib_section;
         }
-        if (CyDocs::inst()->preface !== FALSE) {
-            $preface = file_get_contents(CyDocs::inst()->preface);
+        if (cy\Docs::inst()->preface !== FALSE) {
+            $preface = file_get_contents(cy\Docs::inst()->preface);
             $rval->text = $preface . $rval->text;
         }
-        $rval->title = CyDocs::inst()->title;
+        $rval->title = cy\Docs::inst()->title;
         return $rval;
     }
 

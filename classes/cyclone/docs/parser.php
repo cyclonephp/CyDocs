@@ -1,11 +1,15 @@
 <?php
 
+namespace cyclone\docs;
+
+use cyclone as cy;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Parser {
+class Parser {
 
     /**
      * The annotations that are recognized by the parser.
@@ -52,7 +56,7 @@ class CyDocs_Parser {
      */
     public $documented_code;
 
-    public function  __construct($plain_text, CyDocs_Model $owner) {
+    public function  __construct($plain_text, model\AbstractModel $owner) {
         $this->_plain_text = $plain_text;
         $this->_owner = $owner;
     }
@@ -61,7 +65,7 @@ class CyDocs_Parser {
      * @return CyDocs_Model_Comment
      */
     public function parse() {
-        $rval = new CyDocs_Model_Comment;
+        $rval = new model\CommentModel;
         $this->_plain_text = substr($this->_plain_text, 1, strlen($this->_plain_text) - 2);
         $lines = explode("\n", $this->_plain_text);
 
@@ -98,17 +102,14 @@ class CyDocs_Parser {
                         if ( ! is_null($last_annotation)) {
                             $rval->annotations []= $last_annotation;
                         }
-                        $last_annotation = CyDocs_Model_Annotation::for_raw_annotation($raw_annotation, $this->_owner);
+                        $last_annotation = model\annotation\AbstractAnnotation::for_raw_annotation($raw_annotation, $this->_owner);
                     }
                 } elseif (in_array($raw_annotation[0], self::$enabled_annotations)) {
                     $annotations_part = TRUE;
                     if (!is_null($last_annotation)) {
                         $rval->annotations [] = $last_annotation;
                     }
-                    //echo $this->_owner->string_identifier() . PHP_EOL;
-                    //if ($this->_owner->string_identifier() == 'DB_Expression::compile_expr()')
-                    //print_r($raw_annotation);
-                    $last_annotation = CyDocs_Model_Annotation::for_raw_annotation($raw_annotation, $this->_owner);
+                    $last_annotation = model\annotation\AbstractAnnotation::for_raw_annotation($raw_annotation, $this->_owner);
                 }
             } elseif ($annotations_part) {
                 $last_annotation->text .= $line;

@@ -1,26 +1,30 @@
 <?php
 
+namespace cyclone\docs\model\annotation;
+
+use cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-abstract class CyDocs_Model_Annotation {
+abstract class AbstractAnnotation {
 
     /**
      * @param array $words
      */
     public static function for_raw_annotation($words, $owner) {
         $annotation_name = $words[0];
-        if ( ! in_array($annotation_name, CyDocs_Parser::$enabled_annotations))
-                throw new CyDocs_Exception("unknown annotation: $annotation_name");
+        if ( ! in_array($annotation_name, docs\Parser::$enabled_annotations))
+                throw new docs\Exception("unknown annotation: $annotation_name");
 
-        $class_suffixes = array('author' => 'plain'
+        $class_prefixes = array('author' => 'plain'
             , 'package' => 'plain'
             , 'modified' => 'plain'
             , 'property' => 'type'
             , 'property-read' => 'type'
-            , 'param' => 'type'
+            , 'param' => 'param'
             , 'usedby' => 'link'
             , 'uses' => 'link'
             , 'see' => 'link'
@@ -35,9 +39,9 @@ abstract class CyDocs_Model_Annotation {
             , 'throws' => 'throws'
         );
 
-        $class = 'CyDocs_Model_Annotation_' . $class_suffixes[$annotation_name];
+        $class = 'cyclone\docs\model\annotation\\' . $class_prefixes[$annotation_name] . 'Annotation';
         if ( ! class_exists($class))
-            throw new Exception("error while processing annotation: $annotation_name");
+            throw new docs\Exception("error while processing annotation: $annotation_name");
 
         $inst = new $class($words, $owner);
         return $inst;
@@ -71,16 +75,28 @@ abstract class CyDocs_Model_Annotation {
      */
     protected $_owner;
 
-    private function  __construct($words, CyDocs_Model $owner) {
+    private function  __construct($words, docs\model\AbstractModel $owner) {
         $this->name = array_shift($words);
-        $this->_words = $words;
+        $this->_words = self::clear_empty_words($words);
         $this->_owner = $owner;
         $this->init();
+    }
+
+    public static function clear_empty_words($words) {
+        $rval = array();
+        foreach ($words as $word) {
+            if ($word === '') {
+                
+            } else {
+                $rval []= $word;
+            }
+        }
+        return $rval;
     }
 
     protected abstract function init();
 
     public function  __toString() {
-        return implode(' ', $this->_words);
+        return '@' . $this->name . ' ' . implode(' ', $this->_words);
     }
 }

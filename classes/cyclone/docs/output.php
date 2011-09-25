@@ -1,11 +1,13 @@
 <?php
 
+namespace cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-interface CyDocs_Output {
+interface Output {
 
     public function generate_api();
 

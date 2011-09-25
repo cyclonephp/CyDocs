@@ -1,33 +1,38 @@
 <?php
 
+namespace cyclone;
+
+use cyclone\docs\model;
+use cyclone\docs;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  * @property-read boolean $internal
  */
-class CyDocs {
+class Docs {
 
     /**
      * The singleton instance.
      *
-     * @var CyDocs
+     * @var Docs
      */
     private static $_inst;
 
     /**
-     * The readonly properties of \c CyDocs
+     * The readonly properties of \c Docs
      *
      * @var array
      */
     private static $_enabled_attributes = array('internal', 'title', 'preface');
 
     /**
-     * @return CyDocs
+     * @return Docs
      */
     public static function inst() {
         if (NULL === self::$_inst) {
-            self::$_inst = new CyDocs;
+            self::$_inst = new Docs;
         }
         return self::$_inst;
     }
@@ -56,8 +61,8 @@ class CyDocs {
      * The name of the class that is currently under processing.
      *
      * @var string
-     * @usedby CyDocs_Model::coderef_to_anchor()
-     * @usedby CyDocs_Model_Class
+     * @usedby model\AbstractModel::coderef_to_anchor()
+     * @usedby model\ClassModel
      */
     public $current_class;
 
@@ -65,7 +70,7 @@ class CyDocs {
         if (in_array($key, self::$_enabled_attributes)) {
             return $this->{'_' . $key};
         }
-        throw new CyDocs_Exception("attribute '$key' does not exist or is not readable");
+        throw new Exception("attribute '$key' does not exist or is not readable");
     }
 
 
@@ -94,43 +99,45 @@ class CyDocs {
         $class_models = array();
         foreach ($classnames as $classname) {
             try {
-                $class_models []= CyDocs_Model::for_reflector(new ReflectionClass($classname));
-            } catch (ReflectionException $ex) {
+                $class_models []= model\AbstractModel::for_reflector(new \ReflectionClass($classname));
+            } catch (\ReflectionException $ex) {
                 log_warning($this, $ex->getMessage(), $ex->getCode());
             }
         }
 
         $lib_models = array();
         foreach ($libs as $lib_str) {
-            $lib_models []= new CyDocs_Model_Library($lib_str);
+            $lib_models []= new model\LibraryModel($lib_str);
         }
-
-        CyDocs_Model::fire_post_load();
-        CyDocs_Model_Library::fire_post_load();
+        model\AbstractModel::fire_post_load();
+        model\LibraryModel::fire_post_load();
 
         $root_dir = $args['--root-dir'];
         if ($args['--forced']) {
             try {
                 FileSystem::rmdir($root_dir);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 echo $ex->getMessage();
             }
         }
-        
+
         mkdir($root_dir);
         if (count($libs) > 1) {
-            $output = new CyDocs_Output_HTML($root_dir, $lib_models, $args['--stylesheet']);
+            $output = new docs\output\html\Output($root_dir, $lib_models, $args['--stylesheet']);
         } else {
-            $output = new CyDocs_Output_HTML_Library($root_dir, $lib_models[0], $args['--stylesheet']);
+            $output = new docs\output\html\LibraryOutput($root_dir, $lib_models[0], $args['--stylesheet']);
         }
         $output->generate_api();
         $output->generate_manual();
         if ($args['--measure']) {
             $time = microtime(TRUE) - $start_time;
-            
             $mem_usage = (memory_get_peak_usage() / 1024) / 1024.0;
-            echo sprintf("execution time: %.2f sec\tmax. memoy usage: %.2f" . PHP_EOL
+
+            // display only after the already registered shutdown functions - eg. the log adapter output
+            /*register_shutdown_function(function() use($time, $mem_usage){
+                echo sprintf("execution time: %.2f sec\tmax. memoy usage: %.2f Mb" . \PHP_EOL
                     , $time, $mem_usage);
+            });*/
         }
     }
 
@@ -154,7 +161,7 @@ class CyDocs {
                 continue;
             }
             $classname = substr($classname, 0, strlen($classname) - strlen('.php'));
-            $classname = str_replace(DIRECTORY_SEPARATOR, '_', $classname);
+            $classname = str_replace(DIRECTORY_SEPARATOR, '\\', $classname);
             $rval []= $classname;
         }
         return $rval;

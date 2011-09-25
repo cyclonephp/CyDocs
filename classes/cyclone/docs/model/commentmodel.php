@@ -1,11 +1,13 @@
 <?php
 
+namespace cyclone\docs\model;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Model_Comment {
+class CommentModel {
 
     /**
      * Sequence of lines - the free-form text of the comment.

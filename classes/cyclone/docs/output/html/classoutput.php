@@ -1,11 +1,16 @@
 <?php
 
+namespace cyclone\docs\output\html;
+
+use cyclone\docs;
+use cyclone\docs\model;
+
 /**
  * 
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  */
-class CyDocs_Output_HTML_Class implements CyDocs_Output {
+class ClassOutput implements docs\Output {
 
     /**
      * @var string
@@ -22,7 +27,7 @@ class CyDocs_Output_HTML_Class implements CyDocs_Output {
      */
     private $_stylesheet;
 
-    function __construct($root_dir, CyDocs_Model_Class $model, $stylesheet) {
+    function __construct($root_dir, model\ClassModel $model, $stylesheet) {
         $this->_root_dir = $root_dir;
         $this->_model = $model;
         $this->_stylesheet = $stylesheet;
@@ -33,7 +38,7 @@ class CyDocs_Output_HTML_Class implements CyDocs_Output {
     }
 
     public function generate_manual() {
-        throw new CyDocs_Exception('manual generation for classes is not supported');
+        throw new docs\Exception('manual generation for classes is not supported');
     }
 
 }
