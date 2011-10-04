@@ -12,7 +12,7 @@ return array(
                 'arguments' => array(
                     '--root-dir' => array(
                         'alias' => '-r',
-                        'default' => cy\DOCROOT . 'docs/',
+                        'default' => cy\SYSROOT . 'docs/',
                         'parameter' => '<root-dir>',
                         'descr' => 'the root directory of the generated documentation'
                     ),
