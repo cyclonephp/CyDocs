@@ -25,7 +25,7 @@ abstract class AbstractModel {
      * Object pool for the created class instances.
      * It's maintained by \c for_reflector() .
      *
-     * @var array<CyDocs_Model_Class>
+     * @var array<ClassModel>
      */
     protected static $_classes = array();
 
@@ -33,7 +33,7 @@ abstract class AbstractModel {
      * Object pool for the created method instances.
      * It's maintained by \c for_reflector() .
      *
-     * @var array<CyDocs_Model_Method>
+     * @var array<docs\model\MethodModel>
      */
     protected static $_methods = array();
 
@@ -126,9 +126,10 @@ abstract class AbstractModel {
             $classname = cy\Docs::inst()->current_class;
             $toolname = $coderef[0];
             // the tool name can be a class name
-            if (isset(self::$_classes[$toolname])) {
+            $candidate_classname = self::get_absolute_classname($toolname);
+            if (isset(self::$_classes[$candidate_classname])) {
                 return '<a class="coderef" href="' . $root_path
-                . docs\output\html\LibraryOutput::class_docs_file($toolname) . '">'
+                . docs\output\html\LibraryOutput::class_docs_file($candidate_classname) . '">'
                 . $coderef_str . '</a>';
             }
         } elseif (count($coderef) == 2) {
@@ -139,11 +140,16 @@ abstract class AbstractModel {
             return $coderef_str;
         }
 
+        $classname = self::get_absolute_classname($classname);
+
         $candidate_key = $classname . '::' . $toolname;
 
         $candidate_prop_key = $classname . '::$' . $toolname;
 
         if (isset(self::$_methods[$candidate_key])) {
+            if (substr($toolname, strlen($toolname) - 2) == '()') {
+                $toolname = substr($toolname, 0, strlen($toolname) - 2);
+            }
             return '<a class="coderef" href="' . $root_path
                 . docs\output\html\LibraryOutput::class_docs_file($classname)
                 . '#method-' . $toolname
@@ -164,6 +170,31 @@ abstract class AbstractModel {
         
 
         return $coderef_str;
+    }
+
+    /**
+     * Tries to get the fully qualified name of a class given by
+     * its qualified or unqualified name based on the name of the
+     * currently processed class. If fails, then it will return
+     * <code>$rel_classname</code>.
+     *
+     * @param string $rel_classname
+     * @return string
+     */
+    public static function get_absolute_classname($rel_classname) {
+        if (NULL === cy\Docs::inst()->current_class) {
+            return $rel_classname;
+        }
+        $curr_class = explode('\\', cy\Docs::inst()->current_class);
+        while( ! empty($curr_class)) {
+            array_pop($curr_class);
+            $curr_ns = implode('\\', $curr_class);
+            $candidate = $curr_ns . '\\' . $rel_classname;
+            if (isset(self::$_classes[$candidate])) {
+                return $candidate;
+            }
+        }
+        return $rel_classname;
     }
 
     /**

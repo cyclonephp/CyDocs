@@ -100,3 +100,12 @@ ul.toc a:hover {
 .links a {
     text-decoration: none;
 }
+
+
+body.manual {
+    text-align: justify;
+}
+
+body.manual h1, body.manual h3 {
+    display: block;
+}

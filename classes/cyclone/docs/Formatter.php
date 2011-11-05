@@ -151,6 +151,7 @@ class Formatter {
                             , $token);
                 } else {
                     log_warning($this, "unknown formatting tag '$token'");
+                    $just_parsed = $char . $token;
                 }
             } else {
                 $just_parsed = $char;
@@ -210,6 +211,7 @@ class Formatter {
 
         $section = new model\SectionModel;
         $this->_manual->sections []= $section;
+        $this->_current_subsection = NULL;
         $this->_current_section = $section;
 
         $this->parse_section_line($section);

@@ -10,10 +10,10 @@ return array(
                 'descr' => 'generates API docs for the classes in the enables libraries',
                 'callback' => array(cy\Docs::inst(), 'cli_api_bootstrap'),
                 'arguments' => array(
-                    '--root-dir' => array(
-                        'alias' => '-r',
+                    '--output-dir' => array(
+                        'alias' => '-o',
                         'default' => cy\SYSROOT . 'docs/',
-                        'parameter' => '<root-dir>',
+                        'parameter' => '<output-dir>',
                         'descr' => 'the root directory of the generated documentation'
                     ),
                     '--internal' => array(

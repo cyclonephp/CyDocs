@@ -1,5 +1,5 @@
-<h<?= $level ?>><a name="<?= $section->title ?>"><?= $section->title ?></a></h<?= $level ?>>
-<?= nl2br($section->text) ?>
+<h<?= $level ?>><a name="<?= $section->id ?>"><?= $section->title ?></a></h<?= $level ?>>
+<?= $section->text ?>
 <? foreach ($section->sections as $subsection) 
         echo cyclone\View::factory('cydocs/manual/section', array(
             'section' => $subsection,

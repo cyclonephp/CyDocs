@@ -83,8 +83,9 @@ class Output implements docs\Output {
 
     public function  generate_manual() {
         $lib_manuals = array();
+        cy\Docs::inst()->current_class = NULL;
         foreach ($this->_lib_models as $model) {
-            $lib_root_path = FileSystem::get_root_path($model->name);
+            $lib_root_path = cy\FileSystem::get_root_path($model->name);
             $manual_file = $lib_root_path . 'manual/manual.txt';
             if (file_exists($manual_file)) {
                 $lib_manuals[$model->name] = docs\Formatter::manual_formatter(file_get_contents($manual_file))

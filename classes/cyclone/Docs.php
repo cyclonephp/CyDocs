@@ -112,7 +112,7 @@ class Docs {
         model\AbstractModel::fire_post_load();
         model\LibraryModel::fire_post_load();
 
-        $root_dir = $args['--root-dir'];
+        $root_dir = $args['--output-dir'];
         if ($args['--forced']) {
             try {
                 FileSystem::rmdir($root_dir);

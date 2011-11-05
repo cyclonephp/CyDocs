@@ -3,7 +3,7 @@
     <title><?= $manual->title ?></title>
     <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
 </head>
-<body>
+<body class="manual">
 
 <h1><?= $manual->title ?></h1>
 
@@ -13,7 +13,7 @@
     'sections' => $manual->sections
 ))->render() ?>
 
-<?= nl2br($manual->text) ?>
+<?= $manual->text ?>
 
 <? foreach ($manual->sections as $section)
         echo $section->render(); ?>
