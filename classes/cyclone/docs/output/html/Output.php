@@ -54,7 +54,7 @@ class Output implements docs\Output {
 
     public function generate_api() {
         mkdir($this->_root_dir . 'libs/');
-        $index_view = cy\View::factory('cydocs/index');
+        $index_view = cy\view\PHPView::factory('cydocs/index');
         file_put_contents($this->_root_dir . 'index.html', $index_view->render());
         copy($this->_stylesheet, $this->_root_dir . 'stylesheet.css');
 
@@ -76,7 +76,7 @@ class Output implements docs\Output {
         foreach ($this->_lib_models as $lib_model) {
             $libs_data[$lib_model->name] = $this->_root_dir . 'libs/' . $lib_model->name . '/classes.html';
         }
-        $liblist_view = cy\View::factory('cydocs/libs'
+        $liblist_view = cy\view\PHPView::factory('cydocs/libs'
                 , array('libs' => $libs_data));
         file_put_contents($this->_root_dir . 'libs.html', $liblist_view->render());
     }

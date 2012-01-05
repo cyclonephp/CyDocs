@@ -17,7 +17,7 @@
 <div class="free-form-text">
     <?= $class->free_form_text ?>
 </div>
-<?= cyclone\View::factory('cydocs/libs/links', array('model' => $class))->render() ?>
+<?= cyclone\view\PHPView::factory('cydocs/libs/links', array('model' => $class))->render() ?>
 <? if ( ! empty($class->subclasses)) : ?>
 <h4>Direct known subclasses: </h4>
     <ul>
@@ -67,7 +67,7 @@
     <span class="prop-descr">
     <?= $prop->free_form_text ?>
         </span>
-    <?= cyclone\View::factory('cydocs/libs/links', array('model' => $prop))->render() ?>
+    <?= cyclone\view\PHPView::factory('cydocs/libs/links', array('model' => $prop))->render() ?>
     </span>
 <? endforeach; ?>
 </div>
@@ -76,7 +76,7 @@
 <? if ( ! empty($class->methods)) : ?>
 <h2>Methods</h2>
 <div class="methods">
-<? foreach ($class->methods as $method) echo cyclone\View::factory('cydocs/libs/method', array('method' => $method));?>
+<? foreach ($class->methods as $method) echo cyclone\view\PHPView::factory('cydocs/libs/method', array('method' => $method));?>
     </div>
 <? endif; ?>
  

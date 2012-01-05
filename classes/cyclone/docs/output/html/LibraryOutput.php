@@ -44,7 +44,7 @@ class LibraryOutput implements docs\Output {
     public function generate_api() {
         mkdir($this->_root_dir . 'classes/');
         $this->create_classes_html();
-        $index_view = cy\View::factory('cydocs/libs/index');
+        $index_view = cy\view\PHPView::factory('cydocs/libs/index');
         file_put_contents($this->_root_dir . 'index.html', $index_view->render());
         copy($this->_stylesheet, $this->_root_dir . 'stylesheet.css');
         foreach ($this->_model->classes as $class) {
@@ -67,14 +67,14 @@ class LibraryOutput implements docs\Output {
         foreach ($this->_model->classes as $class_model) {
             $classes_data[$class_model->name] = $this->class_docs_file($class_model->name);
         }
-        $classlist_view = cy\View::factory('cydocs/libs/classes'
+        $classlist_view = cy\view\PHPView::factory('cydocs/libs/classes'
                 , array('classes' => $classes_data));
         file_put_contents($this->_root_dir . 'classes.html', $classlist_view->render());
     }
 
     public function create_class_view(model\ClassModel $class) {
         cy\Docs::inst()->current_class = $class->name;
-        $view = cy\View::factory('cydocs/libs/class');
+        $view = cy\view\PHPView::factory('cydocs/libs/class');
         $view->set('class', $class);
 
         foreach ($class->implemented_interfaces as &$intf) {

@@ -36,7 +36,7 @@ class SectionModel {
     public $text;
 
     public function render() {
-        return cy\View::factory('cydocs/manual/section', array(
+        return cy\view\PHPView::factory('cydocs/manual/section', array(
             'section' => $this,
             'level' => 1
         ))->render();

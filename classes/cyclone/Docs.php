@@ -96,7 +96,7 @@ class Docs {
         }
         $this->_internal = $args['--internal'];
         $classnames = $this->load_classes($libs);
-        $class_models = array();
+        $class_models = array(); 
         foreach ($classnames as $classname) {
             try {
                 $class_models []= model\AbstractModel::for_reflector(new \ReflectionClass($classname));

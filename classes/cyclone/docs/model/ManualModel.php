@@ -30,7 +30,7 @@ class ManualModel {
     public $text;
 
     public function render() {
-        return cy\View::factory('cydocs/manual', array(
+        return cy\view\PHPView::factory('cydocs/manual', array(
             'manual' => $this
         ))->render();
     }

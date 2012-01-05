@@ -29,5 +29,5 @@
         <? endforeach; ?>
     </ul>
     <? endif; ?>
-    <?= cyclone\View::factory('cydocs/libs/links', array('model' => $method))->render() ?>
+    <?= cyclone\view\PHPView::factory('cydocs/libs/links', array('model' => $method))->render() ?>
 </div>
