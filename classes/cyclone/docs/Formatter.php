@@ -167,6 +167,11 @@ class Formatter {
         return $rval;
     }
 
+    public static function add_paragraphs($str) {
+        $str = str_replace(array("\n\n", "\r\n\r\n"), '</p><p>', $str);
+        return '<p>' . $str . '</p>';
+    }
+
     private function tag_coderef($tag) {
         $this->read_whitespaces();
         $coderef = $this->next_token();
@@ -194,6 +199,16 @@ class Formatter {
 
         $highlighted = substr($highlighted, strlen($unwanted_prefix));
 
+        if (cy\Docs::inst()->line_numbers) {
+            $lines = explode('<br />', $highlighted);
+            $idx = 1;
+            $highlighted = '';
+            foreach ($lines as $line) {
+                $highlighted .= '<span style="width: 24px; display: inline-block; color: grey">' . $idx . '</span>' . $line . PHP_EOL;
+                ++$idx;
+            }
+        }
+
         $rval .= $highlighted;
         return $rval . '</code></pre>';
     }
@@ -212,6 +227,9 @@ class Formatter {
         $section = new model\SectionModel;
         $this->_manual->sections []= $section;
         $this->_current_subsection = NULL;
+        if ( ! is_null($this->_current_section)) {
+            $this->_current_section->text = self::add_paragraphs($this->_current_section->text);
+        }
         $this->_current_section = $section;
 
         $this->parse_section_line($section);
@@ -249,6 +267,10 @@ class Formatter {
 
         $subsection = new model\SectionModel;
         $this->_current_section->sections []= $subsection;
+        if ( ! is_null($this->_current_subsection)) {
+            $this->_current_subsection->text = self::add_paragraphs($this->_current_subsection->text);
+        }
+
         $this->_current_subsection = $subsection;
 
         $this->parse_section_line($subsection);

@@ -3,6 +3,7 @@
 namespace cyclone\docs\model;
 
 use cyclone as cy;
+use cyclone\docs;
 
 /**
  * Represents a library manual created by \c CyDocs_Text_Formatter::create_manual()

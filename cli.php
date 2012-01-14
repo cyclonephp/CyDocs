@@ -63,6 +63,11 @@ return array(
                         'alias' => '-p',
                         'default' => FALSE,
                         'descr' => 'The main page of the output. Only used if the generation goes for multiple libraries.'
+                    ),
+                    '--line-numbers' => array(
+                        'parameter' => NULL,
+                        'alias' => '-L',
+                        'descr' => 'show line numbers o code examples'
                     )
                 )
             )

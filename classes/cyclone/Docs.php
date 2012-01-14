@@ -10,6 +10,9 @@ use cyclone\docs;
  * @author Bence Eros <crystal@cyclonephp.com>
  * @package CyDocs
  * @property-read boolean $internal
+ * @property-read string $title
+ * @property-read string $preface
+ * @property-read boolean $line_numbers
  */
 class Docs {
 
@@ -25,7 +28,10 @@ class Docs {
      *
      * @var array
      */
-    private static $_enabled_attributes = array('internal', 'title', 'preface');
+    private static $_enabled_attributes = array('internal'
+        , 'title'
+        , 'preface'
+        , 'line_numbers');
 
     /**
      * @return Docs
@@ -56,6 +62,12 @@ class Docs {
      * @var string
      */
     private $_preface;
+
+    /**
+     *
+     * @var boolean
+     */
+    private $_line_numbers;
 
     /**
      * The name of the class that is currently under processing.
@@ -90,6 +102,7 @@ class Docs {
         }
         $this->_title = $args['--title'];
         $this->_preface = $args['--preface'];
+        $this->_line_numbers = $args['--line-numbers'];
         $libs = explode(',', $args['--lib']);
         if ($libs[0] == 'all') {
             $libs = FileSystem::enabled_libs();
