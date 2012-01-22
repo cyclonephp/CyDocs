@@ -74,7 +74,7 @@ class Output implements docs\Output {
     public function create_libs_html() {
         $libs_data = array();
         foreach ($this->_lib_models as $lib_model) {
-            $libs_data[$lib_model->name] = $this->_root_dir . 'libs/' . $lib_model->name . '/classes.html';
+            $libs_data[$lib_model->name] = './libs/' . $lib_model->name . '/classes.html';
         }
         $liblist_view = cy\view\PHPView::factory('cydocs/libs'
                 , array('libs' => $libs_data));
