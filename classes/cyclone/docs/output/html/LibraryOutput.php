@@ -103,15 +103,22 @@ class LibraryOutput implements docs\Output {
         return 'classes/' . strtolower(str_replace('\\', '/', $classname)) . '.html';
     }
 
-    public static function path_to_root($classname) {
-        $rval = '../';
-        $len = strlen($classname);
-        for ($i = 0; $i < $len; ++$i) {
-            if ($classname{$i} == '\\' || $classname{$i} == '_') {
-                $rval .= '../';
-            }
+    public static function path_to_root($classname = NULL) {
+        if (NULL === $classname) {
+            $classname = cy\Docs::inst()->current_class;
         }
-        return $rval;
+        if (NULL === $classname) {
+            return './';
+        } else {
+            $rval = '../';
+            $len = strlen($classname);
+            for ($i = 0; $i < $len; ++$i) {
+                if ($classname{$i} == '\\' || $classname{$i} == '_') {
+                    $rval .= '../';
+                }
+            }
+            return $rval;
+        }
     }
 
     public function create_property_list($props) {

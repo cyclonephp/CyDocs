@@ -78,6 +78,14 @@ class Docs {
      */
     public $current_class;
 
+    /**
+     * The name of the library which the library manual is currently
+     * generated for.
+     *
+     * @var string
+     */
+    public $current_library = NULL;
+
     public function __get($key) {
         if (in_array($key, self::$_enabled_attributes)) {
             return $this->{'_' . $key};
@@ -117,7 +125,6 @@ class Docs {
                 log_warning($this, $ex->getMessage(), $ex->getCode());
             }
         }
-
         $lib_models = array();
         foreach ($libs as $lib_str) {
             $lib_models []= new model\LibraryModel($lib_str);
