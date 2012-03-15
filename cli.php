@@ -67,7 +67,7 @@ return array(
                     '--line-numbers' => array(
                         'parameter' => NULL,
                         'alias' => '-L',
-                        'descr' => 'show line numbers o code examples'
+                        'descr' => 'show line numbers of code examples'
                     )
                 )
             )

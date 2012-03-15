@@ -133,6 +133,11 @@ class Docs {
         model\LibraryModel::fire_post_load();
 
         $root_dir = $args['--output-dir'];
+	$root_dir_len = strlen($root_dir);
+	$root_dir_end = $root_dir{$root_dir_len - 1};
+	if ( ! ($root_dir_end == \DIRECTORY_SEPARATOR || $root_dir_end == '/')) {
+		$root_dir .= \DIRECTORY_SEPARATOR;
+	}
         if ($args['--forced']) {
             try {
                 FileSystem::rmdir($root_dir);
