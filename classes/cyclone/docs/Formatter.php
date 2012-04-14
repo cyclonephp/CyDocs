@@ -182,7 +182,7 @@ class Formatter {
         $rval = '<pre>';
         $code = '';
         for (;;) {
-            if ($this->_idx == $this->_length - 1) {
+            if ($this->_idx == $this->_length) {
                 log_error("unclosed @code tag, omitting formatted source from output.");
                 return '';
             }
