@@ -7,7 +7,7 @@ use cyclone\docs;
 
 /**
  * 
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  * @property-read boolean $internal
  * @property-read string $title
@@ -24,7 +24,7 @@ class Docs {
     private static $_inst;
 
     /**
-     * The readonly properties of \c Docs
+     * The readonly properties of @c Docs
      *
      * @var array
      */

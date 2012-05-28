@@ -6,7 +6,7 @@ use cyclone as cy;
 
 /**
  * 
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
 class Parser {
@@ -97,6 +97,7 @@ class Parser {
                 if ($blank_line_passed) { // should be annotation
                     if ( ! in_array($raw_annotation[0], self::$enabled_annotations)) {
                         log_warning($this, 'unknown annotation ' . $raw_annotation[0] . ' at ' . $this->_owner->string_identifier());
+                        $rval->text []= $line;
                     } else {
                         $annotations_part = TRUE;
                         if ( ! is_null($last_annotation)) {

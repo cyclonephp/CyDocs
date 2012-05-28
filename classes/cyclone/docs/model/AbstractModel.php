@@ -8,7 +8,7 @@ use cyclone as cy;
 
 /**
  * 
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
 abstract class AbstractModel {
@@ -23,7 +23,7 @@ abstract class AbstractModel {
 
     /**
      * Object pool for the created class instances.
-     * It's maintained by \c for_reflector() .
+     * It's maintained by @c for_reflector() .
      *
      * @var array<ClassModel>
      */
@@ -31,7 +31,7 @@ abstract class AbstractModel {
 
     /**
      * Object pool for the created method instances.
-     * It's maintained by \c for_reflector() .
+     * It's maintained by @c for_reflector() .
      *
      * @var array<docs\model\MethodModel>
      */
@@ -39,7 +39,7 @@ abstract class AbstractModel {
 
     /**
      * Object pool for the created property instances.
-     * It's maintained by \c for_reflector() .
+     * It's maintained by @c for_reflector() .
      *
      * @var array<CyDocs_Model_Class>
      */
@@ -47,7 +47,7 @@ abstract class AbstractModel {
 
     /**
      * Object pool for the created parameter instances.
-     * It's maintained by \c for_reflector() .
+     * It's maintained by @c for_reflector() .
      *
      * @var array<CyDocs_Model_Class>
      */
@@ -207,7 +207,7 @@ abstract class AbstractModel {
 
     /**
      * The reflector instance that is examined. The properties of the subclasses
-     * will be populated using this property by the \c init() implementations.
+     * will be populated using this property by the @c init() implementations.
      *
      * @var Reflector
      */
@@ -229,7 +229,7 @@ abstract class AbstractModel {
 
     /**
      * The <code>uses</code> annotations found in the model comment.
-     * The annotation can be easily rendered, since \c CyDocs_Model_Annotation_Link::init()
+     * The annotation can be easily rendered, since @c CyDocs_Model_Annotation_Link::init()
      * has already created the HTML <code>&lt;a&gt;</code> tag, and resolved
      * the code reference (if any).
      *
@@ -239,7 +239,7 @@ abstract class AbstractModel {
 
     /**
      * The <code>usedby</code> annotations found in the model comment.
-     * The annotation can be easily rendered, since \c CyDocs_Model_Annotation_Link::init()
+     * The annotation can be easily rendered, since @c CyDocs_Model_Annotation_Link::init()
      * has already created the HTML <code>&lt;a&gt;</code> tag, and resolved
      * the code reference (if any).
      *
@@ -250,7 +250,7 @@ abstract class AbstractModel {
 
     /**
      * The <code>see</code> and <code>link</code> annotations found in the model comment.
-     * The annotation can be easily rendered, since \c CyDocs_Model_Annotation_Link::init()
+     * The annotation can be easily rendered, since @c CyDocs_Model_Annotation_Link::init()
      * has already created the HTML <code>&lt;a&gt;</code> tag, and resolved
      * the code reference (if any).
      *
@@ -287,7 +287,7 @@ abstract class AbstractModel {
      *  <li>see</li>
      * </ul>
      *
-     * This method is recommended to be called from the \c post_loading()
+     * This method is recommended to be called from the @c post_loading()
      * implementation of the subclasses.
      * @uses CyDocs_Model::$uses
      */

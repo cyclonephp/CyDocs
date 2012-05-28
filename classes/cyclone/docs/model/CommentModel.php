@@ -4,7 +4,7 @@ namespace cyclone\docs\model;
 
 /**
  * 
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
 class CommentModel {
@@ -18,7 +18,7 @@ class CommentModel {
 
     /**
      * The annotations found in the comment. The array is populated
-     * by \c CyDocs_Parser::parse()
+     * by @c CyDocs_Parser::parse()
      *
      * @var array<CyDocs_Model_Annotation>
      */

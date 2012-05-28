@@ -7,7 +7,7 @@ use cyclone\docs\model;
 
 /**
  * 
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
 class ClassOutput implements docs\Output {

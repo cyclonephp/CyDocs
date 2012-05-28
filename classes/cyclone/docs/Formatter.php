@@ -6,14 +6,14 @@ use cyclone as cy;
 use cyclone\docs;
 use cyclone\docs\model;
 /**
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package cydocs
  */
 class Formatter {
 
     /**
      * Retrurns a formatter that is able to format the lines as library manual text.
-     * After creation the manual can be created using the \c create_manual() method.
+     * After creation the manual can be created using the @c create_manual() method.
      *
      * @param array $text
      * @return CyDocs_Text_Formatter
@@ -70,7 +70,7 @@ class Formatter {
 
     /**
      * Annotation name => formatter callback pairs. Set up in the constructor.
-     * The array items are a subset of \c CyDocs_Text_Formatter::$_available_tag_callbacks
+     * The array items are a subset of @c CyDocs_Text_Formatter::$_available_tag_callbacks
      *
      * @var array
      */
@@ -94,17 +94,17 @@ class Formatter {
 
     /**
      * The index of the last parsed character in $_text .
-     * The main character iteration is done at \c CyDocs_Text_Formatter::format()
-     * but the other parser methods - called by the \c format() method will also
+     * The main character iteration is done at @c CyDocs_Text_Formatter::format()
+     * but the other parser methods - called by the @c format() method will also
      * modify this value. All parser methods should maintain the proper value
-     * manually, first of all they should avoid running it over \c CyDocs_Text_Formatter::$_length .
+     * manually, first of all they should avoid running it over @c CyDocs_Text_Formatter::$_length .
      *
      * @var int
      */
     private $_idx;
 
     /**
-     * The manual instace to be generated. The instance value is created by \c create_manual()
+     * The manual instace to be generated. The instance value is created by @c create_manual()
      * and the parser methods that need this value will throw an exception  if
      * its value is <code>NULL</code>.
      *
@@ -142,7 +142,7 @@ class Formatter {
         $len = $this->_length;
         for($this->_idx = 0; $this->_idx < $len; ++$this->_idx) {
             $char = $this->_text[$this->_idx];// echo $char;
-            if ($char === '@' || $char === '\\') {
+            if ($char === '@') {
                 ++$this->_idx;
                 $token = $this->next_token();
                 if (isset($this->_tag_callbacks[$token])) {
@@ -318,7 +318,7 @@ class Formatter {
     /**
      * Creates the object representing the manual created from the parsed text.
      * You are supposed to call this method only on those instances which were
-     * created using \c CyDocs_Text_Formatter::manual_formatter() .
+     * created using @c CyDocs_Text_Formatter::manual_formatter() .
      *
      *
      * @return CyDocs_Model_Manual

@@ -6,7 +6,7 @@ use cyclone\docs;
 
 /**
  * 
- * @author Bence Eros <crystal@cyclonephp.com>
+ * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
 class MethodModel extends AbstractModel {
@@ -40,7 +40,7 @@ class MethodModel extends AbstractModel {
     public $is_final;
 
     /**
-     * The visibility of the method. See \c CyDocs_Model constants.
+     * The visibility of the method. See @c CyDocs_Model constants.
      *
      * @var string
      */
