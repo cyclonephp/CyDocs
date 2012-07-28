@@ -9,7 +9,7 @@
     <?= $class->name ?>
 </h1>
     <? if ($class->parent_class) : ?>
-    extends <?= $class->parent_class ?>
+    extends <?= $class->parent_class->to_html() ?>
     <? endif; ?>
     <? if ($class->implemented_interfaces) : ?>
     implements <?= implode(' ', $class->implemented_interfaces) ?>

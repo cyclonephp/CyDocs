@@ -6,7 +6,7 @@ use cyclone\docs\model;
 use cyclone\docs;
 
 /**
- * 
+ *
  * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  * @property-read boolean $internal
@@ -29,9 +29,9 @@ class Docs {
      * @var array
      */
     private static $_enabled_attributes = array('internal'
-        , 'title'
-        , 'preface'
-        , 'line_numbers');
+    , 'title'
+    , 'preface'
+    , 'line_numbers');
 
     /**
      * @return Docs
@@ -58,7 +58,7 @@ class Docs {
 
     /**
      * The preface passed by the <code>--preface</code> CLI argument.
-     * 
+     *
      * @var string
      */
     private $_preface;
@@ -94,7 +94,6 @@ class Docs {
     }
 
 
-
     private function  __construct() {
         //empty private constructor
     }
@@ -117,27 +116,27 @@ class Docs {
         }
         $this->_internal = $args['--internal'];
         $classnames = $this->load_classes($libs);
-        $class_models = array(); 
+        $class_models = array();
         foreach ($classnames as $classname) {
             try {
-                $class_models []= model\AbstractModel::for_reflector(new \ReflectionClass($classname));
+                $class_models [] = model\AbstractModel::for_reflector(new \ReflectionClass($classname));
             } catch (\ReflectionException $ex) {
                 log_warning($this, $ex->getMessage(), $ex->getCode());
             }
         }
         $lib_models = array();
         foreach ($libs as $lib_str) {
-            $lib_models []= new model\LibraryModel($lib_str);
+            $lib_models [] = new model\LibraryModel($lib_str);
         }
         model\AbstractModel::fire_post_load();
         model\LibraryModel::fire_post_load();
 
         $root_dir = $args['--output-dir'];
-	$root_dir_len = strlen($root_dir);
-	$root_dir_end = $root_dir{$root_dir_len - 1};
-	if ( ! ($root_dir_end == \DIRECTORY_SEPARATOR || $root_dir_end == '/')) {
-		$root_dir .= \DIRECTORY_SEPARATOR;
-	}
+        $root_dir_len = strlen($root_dir);
+        $root_dir_end = $root_dir{$root_dir_len - 1};
+        if (!($root_dir_end == \DIRECTORY_SEPARATOR || $root_dir_end == '/')) {
+            $root_dir .= \DIRECTORY_SEPARATOR;
+        }
         if ($args['--forced']) {
             try {
                 FileSystem::rmdir($root_dir);
@@ -177,7 +176,7 @@ class Docs {
             if (is_array($val)) {
                 $sub_rval = $this->extract_class_names($val);
                 foreach ($sub_rval as $sub_val) {
-                    $rval []= $sub_val;
+                    $rval [] = $sub_val;
                 }
                 continue;
             }
@@ -187,9 +186,9 @@ class Docs {
             }
             $classname = substr($classname, 0, strlen($classname) - strlen('.php'));
             $classname = str_replace(DIRECTORY_SEPARATOR, '\\', $classname);
-            $rval []= $classname;
+            $rval [] = $classname;
         }
         return $rval;
     }
-    
+
 }

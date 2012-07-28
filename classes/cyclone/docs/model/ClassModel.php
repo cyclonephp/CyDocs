@@ -174,9 +174,9 @@ class ClassModel extends AbstractModel {
         foreach ($this->methods as $model) {
             $model->post_loading();
         }
-        if ( ! is_null($this->parent_class)) {
+        /*if ( ! is_null($this->parent_class)) {
             $this->parent_class = AbstractModel::coderef_to_anchor($this->parent_class->name);
-        }
+        }*/
         uasort($this->subclasses, function($a, $b) {
             return strcmp($a, $b);
         });

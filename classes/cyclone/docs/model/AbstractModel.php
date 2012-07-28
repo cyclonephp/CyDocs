@@ -136,7 +136,7 @@ abstract class AbstractModel {
             $classname = $coderef[0];
             $toolname = $coderef[1];
         } else {
-            log_error($this, "invalid code reference: $coderef");
+            log_error(__CLASS__, "invalid code reference: $coderef");
             return $coderef_str;
         }
 
@@ -184,6 +184,9 @@ abstract class AbstractModel {
     public static function get_absolute_classname($rel_classname) {
         if (NULL === cy\Docs::inst()->current_class) {
             return $rel_classname;
+        }
+        if (isset($rel_classname{0}) && $rel_classname{0} == '\\') { //fully qualified classname
+            return substr($rel_classname, 1);
         }
         $curr_class = explode('\\', cy\Docs::inst()->current_class);
         while( ! empty($curr_class)) {
@@ -311,6 +314,10 @@ abstract class AbstractModel {
             $this->link []= $link_annot;
         }
 
+    }
+
+    public function to_html() {
+        return self::coderef_to_anchor($this->name);
     }
 
 }
