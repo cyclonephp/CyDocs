@@ -2,6 +2,6 @@
 
 return array(
     'adapters' => array(
-        'cyclone\docs' => new \cyclone\log\adapter\OutputAdapter()
+        'cyclone\docs' => new \cyclone\log\adapter\EmptyAdapter()
     )
 );

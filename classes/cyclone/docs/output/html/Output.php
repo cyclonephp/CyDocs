@@ -3,6 +3,7 @@
 namespace cyclone\docs\output\html;
 
 use cyclone\docs;
+use cyclone\docs\model;
 use cyclone as cy;
 
 
@@ -11,7 +12,7 @@ use cyclone as cy;
  * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
-class Output implements docs\Output {
+class Output implements docs\Output, docs\RootPathProvider {
 
     /**
      * The absolute path of the root directory of the generated documentation.
@@ -41,6 +42,8 @@ class Output implements docs\Output {
      */
     private $_stylesheet;
 
+    private $_current_lib;
+
     /**
      *
      * @param string $root_dir
@@ -52,6 +55,14 @@ class Output implements docs\Output {
         $this->_stylesheet = $stylesheet;
     }
 
+    public function path_to_root($classname = NULL) {
+        $lib_root_path = LibraryOutput::lib_path_to_root($classname);
+        if (NULL === $this->_current_lib) {
+            return $lib_root_path;
+        }
+        return $lib_root_path . 'libs/' . $this->_current_lib . '/';
+    }
+
     public function generate_api() {
         mkdir($this->_root_dir . 'libs/');
         $index_view = cy\view\PHPView::factory('cydocs/index');
@@ -61,20 +72,26 @@ class Output implements docs\Output {
         $this->create_libs_html();
 
         foreach ($this->_lib_models as $model) {
+            $this->_current_lib = $model->name;
             $libroot = $this->_root_dir . 'libs/' . $model->name . '/';
             mkdir($libroot);
             $lib_output = new LibraryOutput(
                 $libroot, $model, $this->_stylesheet);
+            model\AbstractModel::set_root_path_provider($lib_output);
             $lib_output->generate_api();
             $lib_output->generate_manual();
+            model\AbstractModel::set_root_path_provider($this);
             $this->_lib_outputs []= $lib_output;
+            $this->_current_lib = $model->name;
         }
     }
 
     public function create_libs_html() {
         $libs_data = array();
         foreach ($this->_lib_models as $lib_model) {
+            $this->_current_lib = $lib_model->name;
             $libs_data[$lib_model->name] = './libs/' . $lib_model->name . '/classes.html';
+            $this->_current_lib = NULL;
         }
         $liblist_view = cy\view\PHPView::factory('cydocs/libs'
                 , array('libs' => $libs_data));
@@ -85,6 +102,7 @@ class Output implements docs\Output {
         $lib_manuals = array();
         cy\Docs::inst()->current_class = NULL;
         foreach ($this->_lib_models as $model) {
+            $this->_current_lib = $model->name;
             $lib_root_path = cy\FileSystem::get_root_path($model->name);
             $manual_file = $lib_root_path . 'manual/manual.txt';
             if (file_exists($manual_file)) {
@@ -94,6 +112,7 @@ class Output implements docs\Output {
             } else {
                 log_warning($this, "no manual found for library '{$model->name}'");
             }
+            $this->_current_lib = NULL;
         }
         file_put_contents($this->_root_dir . 'manual.html'
                 , $this->merge_lib_manuals($lib_manuals)->render());

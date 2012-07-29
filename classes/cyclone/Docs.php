@@ -128,9 +128,6 @@ class Docs {
         foreach ($libs as $lib_str) {
             $lib_models [] = new model\LibraryModel($lib_str);
         }
-        model\AbstractModel::fire_post_load();
-        model\LibraryModel::fire_post_load();
-
         $root_dir = $args['--output-dir'];
         $root_dir_len = strlen($root_dir);
         $root_dir_end = $root_dir{$root_dir_len - 1};
@@ -151,6 +148,10 @@ class Docs {
         } else {
             $output = new docs\output\html\LibraryOutput($root_dir, $lib_models[0], $args['--stylesheet']);
         }
+        model\AbstractModel::set_root_path_provider($output);
+        model\AbstractModel::fire_post_load();
+        model\LibraryModel::fire_post_load();
+
         $output->generate_api();
         $output->generate_manual();
         if ($args['--measure']) {

@@ -1,16 +1,12 @@
 <?php
-
 namespace cyclone\docs;
 
 /**
- * 
  * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
-interface Output {
+interface RootPathProvider {
 
-    public function generate_api();
-
-    public function generate_manual();
+    public function path_to_root($classname = NULL);
 
 }

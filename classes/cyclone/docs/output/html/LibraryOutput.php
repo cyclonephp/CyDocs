@@ -11,7 +11,7 @@ use cyclone as cy;
  * @author Bence Eros <crystal@cyclonephp.org>
  * @package CyDocs
  */
-class LibraryOutput implements docs\Output {
+class LibraryOutput implements docs\Output, docs\RootPathProvider{
 
     /**
      * The absolute path of the directory where the library docs should be
@@ -58,7 +58,7 @@ class LibraryOutput implements docs\Output {
             if ( ! is_dir($dirpath)) {
                 mkdir($dirpath, 0755, TRUE);
             }
-            file_put_contents($filepath, $class_view->render());
+            file_put_contents($filepath, (string) $class_view);
         }
     }
 
@@ -95,6 +95,7 @@ class LibraryOutput implements docs\Output {
         $view->set('properties', $this->create_property_list($class->properties));
         $stylesheet_url = $this->path_to_root($class->name) . 'stylesheet.css';
         $view->set('stylesheet_path', $stylesheet_url);
+        $view = $view->render();
         cy\Docs::inst()->current_class = NULL;
         return $view;
     }
@@ -103,7 +104,7 @@ class LibraryOutput implements docs\Output {
         return 'classes/' . strtolower(str_replace('\\', '/', $classname)) . '.html';
     }
 
-    public static function path_to_root($classname = NULL) {
+    public static function lib_path_to_root($classname = NULL) {
         if (NULL === $classname) {
             $classname = cy\Docs::inst()->current_class;
         }
@@ -119,6 +120,10 @@ class LibraryOutput implements docs\Output {
             }
             return $rval;
         }
+    }
+
+    public function path_to_root($classname = NULL) {
+        return self::lib_path_to_root($classname);
     }
 
     public function create_property_list($props) {

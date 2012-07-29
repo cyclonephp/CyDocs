@@ -58,6 +58,12 @@ abstract class AbstractModel {
         $this->reflector = $reflector;
     }
 
+    protected static $_root_path_provider;
+
+    public static function set_root_path_provider(docs\RootPathProvider $root_path_provider) {
+        self::$_root_path_provider = $root_path_provider;
+    }
+
     /**
      * Factory/object pool method for CyDocs_Model subclasses.
      *
@@ -120,7 +126,7 @@ abstract class AbstractModel {
                     , strlen($coderef_str) - 1 - $gen_arr_prefix_len);
             return 'array&lt;' . self::coderef_to_anchor($generic_param) . '&gt;';
         }
-        $root_path = docs\output\html\LibraryOutput::path_to_root(cy\Docs::inst()->current_class);
+        $root_path = self::$_root_path_provider->path_to_root(cy\Docs::inst()->current_class);
         $coderef = explode('::', $coderef_str);
         if (count($coderef) == 1) {
             $classname = cy\Docs::inst()->current_class;
