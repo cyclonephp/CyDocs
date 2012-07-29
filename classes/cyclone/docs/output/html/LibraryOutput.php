@@ -138,6 +138,11 @@ class LibraryOutput implements docs\Output, docs\RootPathProvider{
             $manual = $formatter->create_manual();
             $manual->title = $this->_model->name;
             file_put_contents($this->_root_dir . 'manual.html', $manual->render());
+            foreach ($manual->assets as $asset_rel_path) {
+                $source = cy\FileSystem::get_root_path($this->_model->name) . 'manual/' . $asset_rel_path;
+                $target = "{$this->_root_dir}manual/$asset_rel_path";
+                cy\FileSystem::copy($source, $target);
+            }
         } else {
             log_warning($this, "no manual found for library '{$this->_model->name}'");
         }

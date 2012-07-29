@@ -64,7 +64,7 @@ class Formatter {
         'internal' => 'internal',
         'section' => 'section',
         'subsection' => 'subsection',
-        'img' => 'image',
+        'img' => 'img',
         'include' => 'include'
     );
 
@@ -183,7 +183,7 @@ class Formatter {
         $code = '';
         for (;;) {
             if ($this->_idx == $this->_length) {
-                log_error("unclosed @code tag, omitting formatted source from output.");
+                log_error($this, "unclosed @code tag, omitting formatted source from output.");
                 return '';
             }
             $code .= $this->read_whitespaces();
@@ -277,7 +277,14 @@ class Formatter {
     }
 
     private function tag_img($tag) {
-        
+        $this->read_whitespaces();
+        $img_rel_path = $this->next_token();
+        $root_path_provider = model\AbstractModel::get_root_path_provider();
+        $root_path = $root_path_provider->path_to_root(cy\Docs::inst()->current_class);
+        if ($this->_manual !== NULL) {
+            $this->_manual->assets []= $img_rel_path;
+        }
+        return "<img src='{$root_path}manual/{$img_rel_path}'/>";
     }
 
     private function tag_include($tag) {

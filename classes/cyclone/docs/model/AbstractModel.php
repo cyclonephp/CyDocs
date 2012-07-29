@@ -65,6 +65,13 @@ abstract class AbstractModel {
     }
 
     /**
+     * @return \cyclone\docs\RootPathProvider
+     */
+    public static function get_root_path_provider() {
+        return self::$_root_path_provider;
+    }
+
+    /**
      * Factory/object pool method for CyDocs_Model subclasses.
      *
      * @param Reflector $reflector

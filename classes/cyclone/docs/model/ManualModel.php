@@ -30,6 +30,12 @@ class ManualModel {
      */
     public $text;
 
+    /**
+     * @var array<string> relative path of the assets (eg. images) of the manual. The
+     *  path is relative to the &lt;library-root&gt;/manual/
+     */
+    public $assets = array();
+
     public function render() {
         return cy\view\PHPView::factory('cydocs/manual', array(
             'manual' => $this
