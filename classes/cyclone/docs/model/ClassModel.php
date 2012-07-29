@@ -127,26 +127,55 @@ class ClassModel extends AbstractModel {
         cy\Docs::inst()->current_class = NULL;
     }
 
+    private function create_pseudo_properties($prop_annots) {
+        foreach ($prop_annots as $prop_annot) {
+            $prop_name = $prop_annot->formal_name;
+            if ($prop_name{0} == '$') {
+                $prop_name = substr($prop_name, 1);
+            }
+            $existing_prop = NULL;
+            foreach ($this->properties as $prop_model) {
+                if ($prop_model->name{0} != '_')
+                    continue;
+
+                $existing_prop_name = substr($prop_model->name, 1);
+                if ($existing_prop_name == $prop_name) {
+                    $existing_prop = $prop_model;
+                    break;
+                }
+            }
+            if ($prop_annot->name == 'property-read') {
+                $new_visibility = AbstractModel::VISIBILITY_READONLY;
+            } else {
+                $new_visibility = AbstractModel::VISIBILITY_PUBLIC;
+            }
+            if ($existing_prop === NULL) {
+                $prop = new PropertyModel;
+                $prop->name = $prop_annot->formal_name;
+                $prop->type = $prop_annot->type;
+                $prop->class = $this;
+                $prop->visibility = $new_visibility;
+                $this->properties [] = $prop;
+                $obj_pool_key = $this->name . '::' . $prop->name;
+                self::$_properties[$obj_pool_key] = $prop;
+            } else {
+                $existing_prop->visibility = $new_visibility;
+                $old_pool_key = $this->name . '::' . $existing_prop->name;
+                $existing_prop->name = substr($existing_prop->name, 1);
+                $new_pool_key = $this->name . '::' . $existing_prop->name;
+                unset(self::$_properties[$old_pool_key]);
+                self::$_properties[$new_pool_key] = $existing_prop;
+            }
+        }
+    }
+
     public function  post_loading() {
         parent::post_loading();
         cy\Docs::inst()->current_class = $this->name;
         $parser = new docs\Parser($this->comment, $this);
         $comment = $this->comment = $parser->parse();
         $prop_annots = $comment->annotations_by_name(array('property', 'property-read'));
-        foreach ($prop_annots as $prop_annot) {
-            $prop = new PropertyModel;
-            $prop->name = $prop_annot->formal_name;
-            $prop->type = $prop_annot->type;
-            $prop->class = $this;
-            if ($prop_annot->name == 'property-read') {
-                $prop->visibility = AbstractModel::VISIBILITY_READONLY;
-            } else {
-                $prop->visibility = AbstractModel::VISIBILITY_PUBLIC;
-            }
-            $this->properties []= $prop;
-            $obj_pool_key = $this->name . '::' . $prop->name;
-            self::$_properties[$obj_pool_key] = $prop;
-        }
+        $this->create_pseudo_properties($prop_annots);
         $pkg_annots = $comment->annotations_by_name('package');
         switch (count($pkg_annots)) {
             case 0:
