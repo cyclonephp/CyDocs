@@ -30,8 +30,10 @@ class TypeAnnotation extends AbstractAnnotation {
             if (strlen($this->_words[$i]) > 0) {
                 if ($this->_words[$i][0] == '$') {
                     $this->formal_name = $this->_words[$i];
-                } else {
+                } elseif ($this->type === NULL) {
                     $this->type = $this->_words[$i];
+                } else {
+                    $this->text .= $this->_words[$i] . ' ';
                 }
             }
         }
