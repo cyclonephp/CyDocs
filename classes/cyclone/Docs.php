@@ -90,7 +90,7 @@ class Docs {
         if (in_array($key, self::$_enabled_attributes)) {
             return $this->{'_' . $key};
         }
-        throw new Exception("attribute '$key' does not exist or is not readable");
+        throw new PropertyAccessException(get_class($this), $key);
     }
 
 
