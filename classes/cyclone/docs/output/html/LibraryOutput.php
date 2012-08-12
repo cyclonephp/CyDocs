@@ -62,13 +62,28 @@ class LibraryOutput implements docs\Output, docs\RootPathProvider{
         }
     }
 
+    private function group_by_namespaces($classes) {
+        $rval = array();
+        foreach ($classes as $classname => $class_file_url) {
+            $last_slash_pos = strrpos($classname, '\\');
+            $namespace = substr($classname, 0, $last_slash_pos);
+            $class_relname = substr($classname, $last_slash_pos + 1);
+            if ( ! isset($rval[$namespace])) {
+                $rval[$namespace] = array();
+            }
+            $rval[$namespace][$class_relname] = $class_file_url;
+        }
+        return $rval;
+    }
+
     public function create_classes_html() {
         $classes_data = array();
         foreach ($this->_model->classes as $class_model) {
             $classes_data[$class_model->name] = $this->class_docs_file($class_model->name);
         }
+        $namespaces_data = $this->group_by_namespaces($classes_data);
         $classlist_view = cy\view\PHPView::factory('cydocs/libs/classes'
-                , array('classes' => $classes_data));
+                , array('classes' => $classes_data, 'namespaces' => $namespaces_data));
         file_put_contents($this->_root_dir . 'classes.html', $classlist_view->render());
     }
 

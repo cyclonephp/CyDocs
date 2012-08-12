@@ -6,8 +6,18 @@ body {
     font-family: sans-serif;
 }
 
-.classes {
+ul.classes, ul.packages {
     list-style-type: none;
+}
+
+ul.packages {
+    margin-left: -35px;
+}
+
+ul.packages > li {
+    font-family: Verdana;
+    font-size: 90%;
+    font-weight: bold;
 }
 
 .classes a {
@@ -108,4 +118,12 @@ body.manual {
 
 body.manual h1, body.manual h3 {
     display: block;
+}
+
+.modifiers {
+    font-family: courier;
+    font-style: italic;
+    font-size: 90%;
+    font-weight: bold;
+    color: #00008b;
 }
