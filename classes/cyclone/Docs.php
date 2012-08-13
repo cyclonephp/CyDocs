@@ -138,7 +138,7 @@ class Docs {
             try {
                 FileSystem::rmdir($root_dir);
             } catch (\Exception $ex) {
-                echo $ex->getMessage();
+                // echo $ex->getMessage();
             }
         }
 
